@@ -20,8 +20,8 @@ module.exports.login = async (req, res) => {
             email: users.email,
             displayName: users.displayName,
             avatar: users.avatar,
-            token: accessToken,
             phone: users.phone,
+            token: accessToken,
           });
       });
     } else {
@@ -89,6 +89,10 @@ module.exports.updateinfo = (req, res) => {
           });
       });
     }
+    const userUpdateNonAvt = {
+      displayName: displayName,
+      phone: phone,
+    };
     const userUpdate = {
       displayName: displayName,
       phone: phone,
@@ -96,12 +100,16 @@ module.exports.updateinfo = (req, res) => {
         ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
         : null,
     };
-    User.findByIdAndUpdate(id, userUpdate, (err, user) => {
-      if (err) res.send(err);
-      res.status(200).json({
-        message: "Cập nhật thành công",
-      });
-    });
+    User.findByIdAndUpdate(
+      id,
+      req.file ? userUpdate : userUpdateNonAvt,
+      (err, user) => {
+        if (err) res.send(err);
+        res.status(200).json({
+          message: "Cập nhật thành công",
+        });
+      }
+    );
   } else {
     return res.status(400).json({
       message: "Nhập sai cú pháp, kiểm tra lại",

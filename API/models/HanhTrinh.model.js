@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const User = require("./TaiKhoan.model");
+const Schedule = require("./LichTrinh.model");
+const Desination = require("./DiaDiem.model");
 
 const Schema = mongoose.Schema;
 
@@ -18,15 +21,16 @@ var travelSchema = new Schema({
     ref: "Destination",
     required: true,
   },
-  start_day: Date,
-  end_day: Date,
+  start_day: { type: Date, required: true },
+  end_day: { type: Date, required: true },
   rating: Number,
   title: String,
   description: String,
-  price: Number,
+  price: { type: Number, required: true },
   schedule: {
     type: String,
     ref: "Schedule",
+    required: true,
   },
   create_by: {
     type: String,

@@ -25,6 +25,9 @@ route.put(
   updateinfo
 );
 
+// route.post("/test", authenticationMiddleware, controller.posttest);
+// route.get("/test", authenticationMiddleware, controller.gettest);
+
 // route.get("/api/user", (req, res) => {
 //   User.find((err, users) => {
 //     if (err) res.send(err);

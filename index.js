@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const userRoute = require("./API/routes/TaiKhoan.route");
+const travelRoute = require("./API/routes/HanhTrinh.route");
 
 const app = express();
 const port = 3000;
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 app.use(express.static("public")); // file static in public folder
 
 app.use("/api/user", userRoute);
+app.use("/api/travel", travelRoute);
 app.get("/", (req, res) => {
   res.send("Hello");
 });

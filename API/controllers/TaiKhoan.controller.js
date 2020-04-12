@@ -18,7 +18,7 @@ module.exports.login = async (req, res) => {
         else
           res.status(200).json({
             email: users.email,
-            displayName: users.displayName,
+            display_name: users.display_name,
             avatar: users.avatar,
             phone: users.phone,
             token: accessToken,
@@ -54,7 +54,7 @@ module.exports.register = async (req, res) => {
     } else {
       let newUser = {
         email: email,
-        displayName: displayName,
+        display_name: displayName,
         password: password,
         avatar: null,
         phone: null,
@@ -90,11 +90,11 @@ module.exports.updateinfo = (req, res) => {
       });
     }
     const userUpdateNonAvt = {
-      displayName: displayName,
+      display_name: displayName,
       phone: phone,
     };
     const userUpdate = {
-      displayName: displayName,
+      display_name: displayName,
       phone: phone,
       avatar: req.file
         ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
@@ -105,9 +105,19 @@ module.exports.updateinfo = (req, res) => {
       req.file ? userUpdate : userUpdateNonAvt,
       (err, user) => {
         if (err) res.send(err);
-        res.status(200).json({
-          message: "Cập nhật thành công",
-        });
+        else {
+          User.findById(id, (err, usernew) => {
+            if (err) res.send(err);
+            else {
+              res.status(200).json({
+                email: usernew.email,
+                display_name: usernew.displayName,
+                avatar: usernew.avatar,
+                phone: usernew.phone,
+              });
+            }
+          });
+        }
       }
     );
   } else {

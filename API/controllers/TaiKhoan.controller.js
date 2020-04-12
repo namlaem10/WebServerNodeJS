@@ -105,9 +105,19 @@ module.exports.updateinfo = (req, res) => {
       req.file ? userUpdate : userUpdateNonAvt,
       (err, user) => {
         if (err) res.send(err);
-        res.status(200).json({
-          message: "Cập nhật thành công",
-        });
+        else {
+          User.findById(id, (err, usernew) => {
+            if (err) res.send(err);
+            else {
+              res.status(200).json({
+                email: usernew.email,
+                displayName: usernew.displayName,
+                avatar: usernew.avatar,
+                phone: usernew.phone,
+              });
+            }
+          });
+        }
       }
     );
   } else {

@@ -1,28 +1,24 @@
 const express = require("express");
 const multer = require("multer");
 
-const controller = require("../controllers/TaiKhoan.controller");
+const controller = require("../controllers/DiaDiem.controller");
 const auth = require("../middlewares/authMiddleware");
 
 const { authenticationMiddleware } = auth;
-const { changepassword, updateinfo, login, register } = controller;
+const { all, update } = controller;
 
 const route = express.Router();
 const upload = multer({ dest: "public/uploads" });
 
 //API for mobile app
 
-route.post("/login", login);
-
-route.post("/register", register);
-
-route.put("/changepassword", authenticationMiddleware, changepassword);
+route.get("/all", authenticationMiddleware, all);
 
 route.put(
-  "/updateinfo",
+  "/update/:id",
   authenticationMiddleware,
-  upload.single("avatar"),
-  updateinfo
+  upload.single("destination_image"),
+  update
 );
 
 module.exports = route;

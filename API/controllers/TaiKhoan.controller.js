@@ -111,7 +111,7 @@ module.exports.updateinfo = (req, res) => {
             else {
               res.status(200).json({
                 email: usernew.email,
-                display_name: usernew.displayName,
+                display_name: usernew.display_name,
                 avatar: usernew.avatar,
                 phone: usernew.phone,
               });

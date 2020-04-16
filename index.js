@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const userRoute = require("./API/routes/TaiKhoan.route");
 const travelRoute = require("./API/routes/HanhTrinh.route");
+const destinationRoute = require("./API/routes/DiaDiem.route");
 
 const app = express();
 const port = 3000;
@@ -25,6 +26,8 @@ app.use(express.static("public")); // file static in public folder
 
 app.use("/api/user", userRoute);
 app.use("/api/travel", travelRoute);
+app.use("/api/destination", destinationRoute);
+
 app.get("/", (req, res) => {
   res.send("Hello");
 });

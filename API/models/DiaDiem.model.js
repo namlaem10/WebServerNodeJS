@@ -8,7 +8,10 @@ var destinationSchema = new Schema({
     required: true,
     unique: true,
   },
+  destination_image: String,
   destination_name: String,
+  longitude: Number,
+  latitude: Number,
   create_at: Date,
   update_at: Date,
 });

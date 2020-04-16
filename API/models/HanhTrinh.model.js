@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("./TaiKhoan.model");
 const Schedule = require("./LichTrinh.model");
 const Desination = require("./DiaDiem.model");
+const TouristDesination = require("./DiemThamQuan.Model");
 
 const Schema = mongoose.Schema;
 
@@ -37,6 +38,7 @@ var travelSchema = new Schema({
     ref: "User",
     required: true,
   },
+  member: [{ type: String, ref: "User", required: true }],
   background: String,
   create_at: Date,
   update_at: Date,

@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
@@ -12,51 +11,52 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_1",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_2",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_3",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_4",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_5",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_6",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_7",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
+    .populate("member", "-_id -password")
     .exec((err, travel) => {
       if (err) res.send(err);
       else {
@@ -75,51 +75,52 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_1",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_2",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_3",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_4",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_5",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_6",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
     .populate({
       path: "schedule",
       populate: {
         path: "schedule_detail.day_7",
-        select: "-_id -destination",
+        select: "-destination",
       },
     })
+    .populate("member", "-_id -password")
     .exec((err, travel) => {
       if (err) res.send(err);
       else {
@@ -130,7 +131,21 @@ module.exports.own = (req, res) => {
 
 module.exports.create = async (req, res) => {
   const id = req.user.idUser;
+  const member = req.body.member ? req.body.member : [];
+  member.unshift(id);
   if (req.body) {
+    if (req.file) {
+      const tempPath = req.file.path;
+      const targetName = `public/uploads/${req.file.filename}.${
+        req.file.mimetype.split("/")[1]
+      }`;
+      fs.rename(tempPath, targetName, (err) => {
+        if (err)
+          res.status(500).json({
+            message: "Oops! Something went wrong!",
+          });
+      });
+    }
     const lastest = await Schedule.findOne().sort({ _id: -1 });
     const new_id = parseInt(lastest._id.split("T")[1]) + 1;
     const schedule = new Schedule({
@@ -138,7 +153,7 @@ module.exports.create = async (req, res) => {
       destination: req.body.destination,
       number_of_days: Object.keys(req.body.schedule_detail).length,
       schedule_detail: req.body.schedule_detail,
-      create_at: req.body.create_at,
+      create_at: new Date().toISOString().slice(0, 10),
       update_at: null,
     });
     schedule.save(async (err2) => {
@@ -156,7 +171,8 @@ module.exports.create = async (req, res) => {
         description: req.body.description,
         price: req.body.price,
         schedule: schedule._id,
-        create_at: req.body.create_at,
+        member: member,
+        create_at: new Date().toISOString().slice(0, 10),
         update_at: null,
         create_by: id,
         background: req.file
@@ -164,6 +180,7 @@ module.exports.create = async (req, res) => {
           : null,
       });
       travel.save((err3) => {
+        if (err3) res.status(400).send(err3);
         res.status(200).json({
           message: "success",
         });
@@ -172,6 +189,64 @@ module.exports.create = async (req, res) => {
   }
 };
 
-module.exports.update = (req, res) => {};
+module.exports.remove = (req, res) => {
+  const id = req.params.id;
+  if (id) {
+    Travel.findById(id, (err, travel) => {
+      if (err) res.status(400).send(err);
+      if (travel) {
+        Travel.deleteOne({ _id: travel._id }, (err) => {
+          if (err) res.status(400).send(err);
+          else {
+            Schedule.deleteOne({ _id: travel.schedule }, (err) => {
+              if (err) res.status(400).send(err);
+              res.status(200).json({
+                message: "Xóa hành trình thành công",
+              });
+            });
+          }
+        });
+      } else {
+        res.status(400).json({ message: "Đã có lỗi xảy ra, vui lòng thử lại" });
+      }
+    });
+  } else {
+    res.status(400).json({ message: "Sai cú pháp, kiểm tra và thử lại" });
+  }
+};
 
-module.exports.remove = (req, res) => {};
+module.exports.update = (req, res) => {
+  const id = req.params.id;
+  const member = req.body.member ? req.body.member : [];
+  if (id) {
+    Travel.findById(id, (err, travel) => {
+      if (err) res.status(400).send(err);
+      if (req.body.member) {
+        Travel.updateOne(
+          { _id: id },
+          {
+            member: [...travel.member, ...member],
+            update_at: new Date().toISOString().slice(0, 10),
+          },
+          (err) => {
+            if (err) res.status(400).send(err);
+          }
+        );
+      }
+      if (travel) {
+        const updateSchedule = {
+          schedule_detail: req.body.schedule_detail,
+          update_at: new Date().toISOString().slice(0, 10),
+        };
+        Schedule.updateOne({ _id: travel.schedule }, updateSchedule, (err) => {
+          if (err) res.status(400).send(err);
+          res.status(200).json({ message: "Cập nhật lịch trình thành công" });
+        });
+      } else {
+        res.status(400).json({ message: "Đã có lỗi xảy ra, vui lòng thử lại" });
+      }
+    });
+  } else {
+    res.status(400).json({ message: "Sai cú pháp, kiểm tra và thử lại" });
+  }
+};

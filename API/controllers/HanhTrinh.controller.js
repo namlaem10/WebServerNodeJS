@@ -57,6 +57,7 @@ module.exports.all = (req, res) => {
       },
     })
     .populate("member", "-_id -password")
+    .sort({ create_at: -1 })
     .exec((err, travel) => {
       if (err) res.send(err);
       else {
@@ -121,6 +122,7 @@ module.exports.own = (req, res) => {
       },
     })
     .populate("member", "-_id -password")
+    .sort({ create_at: -1 })
     .exec((err, travel) => {
       if (err) res.send(err);
       else {
@@ -181,11 +183,14 @@ module.exports.create = async (req, res) => {
       });
       travel.save((err3) => {
         if (err3) res.status(400).send(err3);
-        res.status(200).json({
-          message: "success",
+        Travel.findById(travel._id, (err, travel_new) => {
+          if (err) res.status(400).send(err);
+          res.status(200).json(travel_new);
         });
       });
     });
+  } else {
+    res.status(400).json({ message: "Sai cú pháp, kiểm tra và thử lại" });
   }
 };
 

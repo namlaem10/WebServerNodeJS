@@ -27,15 +27,4 @@ route.post(
   create
 );
 
-// route.post("/register", register);
-
-// route.put("/changepassword", authenticationMiddleware, changepassword);
-
-// route.put(
-//   "/updateinfo",
-//   authenticationMiddleware,
-//   upload.single("avatar"),
-//   updateinfo
-// );
-
 module.exports = route;

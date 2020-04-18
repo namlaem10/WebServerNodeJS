@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const userRoute = require("./API/routes/TaiKhoan.route");
 const travelRoute = require("./API/routes/HanhTrinh.route");
 const destinationRoute = require("./API/routes/DiaDiem.route");
+const scheduleRoute = require("./API/routes/LichTrinh.route");
+const touristDestinationRoute = require("./API/routes/DiemThamQuan.route");
 
 const app = express();
 const port = 3000;
@@ -27,6 +29,8 @@ app.use(express.static("public")); // file static in public folder
 app.use("/api/user", userRoute);
 app.use("/api/travel", travelRoute);
 app.use("/api/destination", destinationRoute);
+app.use("/api/schedule", scheduleRoute);
+app.use("/api/touristdestination", touristDestinationRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello");

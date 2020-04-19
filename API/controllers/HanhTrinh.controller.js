@@ -221,8 +221,10 @@ module.exports.remove = (req, res) => {
 };
 
 module.exports.update = (req, res) => {
-  const id = req.params.id;
+  const idUser = req.user.idUser;
   const member = req.body.member ? req.body.member : [];
+  member.unshift(idUser);
+  const id = req.params.id;
   if (id) {
     Travel.findById(id, (err, travel) => {
       if (err) res.status(400).send(err);
@@ -230,7 +232,7 @@ module.exports.update = (req, res) => {
         Travel.updateOne(
           { _id: id },
           {
-            member: [...travel.member, ...member],
+            member: member,
             update_at: new Date().toISOString().slice(0, 10),
           },
           (err) => {

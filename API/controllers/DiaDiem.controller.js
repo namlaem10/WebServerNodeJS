@@ -30,13 +30,13 @@ module.exports.update = (req, res) => {
       destination_image: `uploads/${req.file.filename}.${
         req.file.mimetype.split("/")[1]
       }`,
-      update_at: new Date().toISOString().slice(0, 10),
+      update_at: new Date().toLocaleString(),
     };
     const destination_update_non_image = {
       destination_name: req.body.destination_name,
       longitude: req.body.longitude,
       latitude: req.body.latitude,
-      update_at: new Date().toISOString().slice(0, 10),
+      update_at: new Date().toLocaleString(),
     };
     Destination.findByIdAndUpdate(
       id,

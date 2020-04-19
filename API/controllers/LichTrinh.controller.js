@@ -5,7 +5,7 @@ module.exports.suggest = (req, res) => {
   const { destination, day } = req.query;
   if (parseInt(day) <= 7) {
     Schedule.find({
-      status: "suggest",
+      status: "suggested",
       destination: destination,
       number_of_days: parseInt(day),
     })

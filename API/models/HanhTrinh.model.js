@@ -39,7 +39,16 @@ var travelSchema = new Schema({
     required: true,
   },
   member: [{ type: String, ref: "User", required: true }],
+  comment: [
+    {
+      avatar: String,
+      username: String,
+      content: String,
+      create_at: Date,
+    },
+  ],
   background: String,
+  isShare: Boolean,
   create_at: Date,
   update_at: Date,
 });

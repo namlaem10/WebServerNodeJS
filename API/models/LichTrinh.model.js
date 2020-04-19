@@ -21,6 +21,7 @@ var scheduleSchema = new mongoose.Schema({
     day_6: [{ type: String, ref: "TouristDesination" }],
     day_7: [{ type: String, ref: "TouristDesination" }],
   },
+  status: String,
   create_at: Date,
   update_at: Date,
 });

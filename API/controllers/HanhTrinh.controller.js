@@ -1,6 +1,7 @@
 const fs = require("fs");
 const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
+const User = require("../models/TaiKhoan.model");
 
 module.exports.all = (req, res) => {
   Travel.find({})
@@ -155,7 +156,8 @@ module.exports.create = async (req, res) => {
       destination: req.body.destination,
       number_of_days: Object.keys(req.body.schedule_detail).length,
       schedule_detail: req.body.schedule_detail,
-      create_at: new Date().toISOString().slice(0, 10),
+      status: "created",
+      create_at: new Date().toLocaleString(),
       update_at: null,
     });
     schedule.save(async (err2) => {
@@ -174,8 +176,9 @@ module.exports.create = async (req, res) => {
         price: req.body.price,
         schedule: schedule._id,
         member: member,
-        create_at: new Date().toISOString().slice(0, 10),
+        create_at: new Date().toLocaleString(),
         update_at: null,
+        isShare: false,
         create_by: id,
         background: req.file
           ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
@@ -233,7 +236,7 @@ module.exports.update = (req, res) => {
           { _id: id },
           {
             member: member,
-            update_at: new Date().toISOString().slice(0, 10),
+            update_at: new Date().toLocaleString(),
           },
           (err) => {
             if (err) res.status(400).send(err);
@@ -243,7 +246,7 @@ module.exports.update = (req, res) => {
       if (travel) {
         const updateSchedule = {
           schedule_detail: req.body.schedule_detail,
-          update_at: new Date().toISOString().slice(0, 10),
+          update_at: new Date().toLocaleString(),
         };
         Schedule.updateOne({ _id: travel.schedule }, updateSchedule, (err) => {
           if (err) res.status(400).send(err);
@@ -256,4 +259,27 @@ module.exports.update = (req, res) => {
   } else {
     res.status(400).json({ message: "Sai cú pháp, kiểm tra và thử lại" });
   }
+};
+
+module.exports.comment = async (req, res) => {
+  const idUser = req.user.idUser;
+  const user = await User.findOne({ _id: idUser });
+  const idTravel = req.params.id;
+  const new_comment = {
+    avatar: user.avatar,
+    username: user.display_name,
+    content: req.body.content,
+    create_at: new Date().toLocaleString(),
+  };
+  Travel.findById(idTravel, (err, travel) => {
+    if (err) res.status(400).send(err);
+    Travel.updateOne(
+      { _id: idTravel },
+      { comment: [...travel.comment, new_comment] },
+      (err) => {
+        if (err) res.status(400).send(err);
+        res.status(200).json({ message: "Cập nhật comment thành công" });
+      }
+    );
+  });
 };

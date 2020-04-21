@@ -25,6 +25,7 @@ var travelSchema = new Schema({
   start_day: { type: Date, required: true },
   end_day: { type: Date, required: true },
   rating: Number,
+  rating_count: Number,
   title: String,
   description: String,
   price: { type: Number, required: true },

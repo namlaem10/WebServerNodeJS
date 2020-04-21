@@ -20,6 +20,7 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  friend: [{ type: String, ref: "User" }],
   phone: String,
   avatar: String,
   create_at: Date,

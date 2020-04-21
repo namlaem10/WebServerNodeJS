@@ -57,7 +57,7 @@ module.exports.all = (req, res) => {
         select: "-destination",
       },
     })
-    .populate("member", "-_id -password")
+    .populate("member", "email display_name avatar phone")
     .sort({ create_at: -1 })
     .exec((err, travel) => {
       if (err) res.status(400).send(err);
@@ -122,7 +122,7 @@ module.exports.own = (req, res) => {
         select: "-destination",
       },
     })
-    .populate("member", "-_id -password")
+    .populate("member", "email display_name avatar phone")
     .sort({ create_at: -1 })
     .exec((err, travel) => {
       if (err) res.status(400).send(err);
@@ -171,6 +171,7 @@ module.exports.create = async (req, res) => {
         start_day: req.body.start_day,
         end_day: req.body.end_day,
         rating: req.body.rating,
+        rating_count: 0,
         title: req.body.title,
         description: req.body.description,
         price: req.body.price,
@@ -239,7 +240,7 @@ module.exports.create = async (req, res) => {
               select: "-destination",
             },
           })
-          .populate("member", "-_id -password")
+          .populate("member", "email display_name avatar phone")
           .exec((err, travel_new) => {
             if (err) res.status(400).send(err);
             else {
@@ -367,7 +368,7 @@ module.exports.update = (req, res) => {
               select: "-destination",
             },
           })
-          .populate("member", "-_id -password")
+          .populate("member", "email display_name avatar phone")
           .exec((err, travel_update) => {
             if (err) res.status(400).send(err);
             else {

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const User = require("../models/TaiKhoan.model");
+const Travel = require("../models/HanhTrinh.model");
 
 const accessTokenSecret = "dangcongsanvietnammuonnam";
 
@@ -13,17 +14,34 @@ module.exports.login = async (req, res) => {
     });
     if (userFind) {
       const accessToken = jwt.sign({ idUser: userFind._id }, accessTokenSecret);
-      User.findOne({ email: email }, (err, users) => {
-        if (err) res.send(err);
-        else
-          res.status(200).json({
-            email: users.email,
-            display_name: users.display_name,
-            avatar: users.avatar,
-            phone: users.phone,
-            token: accessToken,
-          });
-      });
+      User.findOne({ _id: userFind._id }, "-password")
+        .populate("friend", "email display_name avatar phone")
+        .exec(async (err, user_return) => {
+          if (err) res.status(400).send(err);
+          else {
+            const travel = await Travel.find({ create_by: userFind._id });
+            const total_travel = travel.length;
+            const travel_share = travel.filter((item) => {
+              return item.isShare === true;
+            });
+            let total_rating = 0;
+            let person_rating = 0;
+            travel_share.map((item) => {
+              return (
+                (total_rating += item.rating),
+                (person_rating += item.rating_count)
+              );
+            });
+            res.json({
+              user_info: user_return,
+              token: accessToken,
+              total_travel: total_travel,
+              travel_share: travel_share.length,
+              rating_point: Math.round(total_rating / travel_share.length),
+              people_rating: person_rating,
+            });
+          }
+        });
     } else {
       return res.status(401).json({
         message: "Email hoặc mật khẩu chưa chính xác",
@@ -52,15 +70,21 @@ module.exports.register = async (req, res) => {
         message: "Email đã tồn tại",
       });
     } else {
+      const lastest = await User.findOne().sort({ _id: -1 });
+      const new_id = parseInt(lastest._id.split("R")[1]) + 1;
       let newUser = {
+        _id: new_id < 10 ? `USER0${new_id}` : `USER${new_id}`,
         email: email,
         display_name: displayName,
         password: password,
+        friend: [],
+        create_at: new Date().toLocaleString(),
+        update_at: null,
         avatar: null,
         phone: null,
       };
-      User.create(newUser, (err, user) => {
-        if (err) res.send(err);
+      User.create(newUser, (err) => {
+        if (err) res.status(400).send(err);
         res.status(200).json({
           message: "Đăng kí thành công",
         });
@@ -104,10 +128,10 @@ module.exports.updateinfo = (req, res) => {
       id,
       req.file ? userUpdate : userUpdateNonAvt,
       (err, user) => {
-        if (err) res.send(err);
+        if (err) res.status(400).send(err);
         else {
           User.findById(id, (err, usernew) => {
-            if (err) res.send(err);
+            if (err) res.status(400).send(err);
             else {
               res.status(200).json({
                 email: usernew.email,
@@ -132,10 +156,10 @@ module.exports.changepassword = (req, res) => {
   if (password !== undefined && newpassword !== undefined) {
     const id = req.user.idUser;
     User.findById(id, (err, user) => {
-      if (err) res.send(err);
+      if (err) res.status(400).send(err);
       if (user.password === password) {
         User.findByIdAndUpdate(id, { password: newpassword }, (err, users) => {
-          if (err) res.send(err);
+          if (err) res.status(400).send(err);
           res.status(200).json({
             message: "Thay đổi mật khẩu thành công",
           });

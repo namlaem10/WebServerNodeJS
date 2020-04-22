@@ -384,6 +384,104 @@ module.exports.update = (req, res) => {
   }
 };
 
+module.exports.blog = (req, res) => {
+  const idTravel = req.params.id;
+  if (req.file) {
+    const tempPath = req.file.path;
+    const targetName = `public/uploads/${req.file.filename}.${
+      req.file.mimetype.split("/")[1]
+    }`;
+    fs.rename(tempPath, targetName, (err) => {
+      if (err)
+        res.status(500).json({
+          message: "Oops! Something went wrong!",
+        });
+    });
+  }
+  const updateBlogWithBackground = {
+    title: req.body.title,
+    description: req.body.description,
+    background: req.file
+      ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
+      : null,
+    isShare: true,
+    update_at: new Date().toLocaleString(),
+  };
+  const updateBlogNoneBackground = {
+    title: req.body.title,
+    description: req.body.description,
+    isShare: true,
+    update_at: new Date().toLocaleString(),
+  };
+  Travel.findByIdAndUpdate(
+    idTravel,
+    req.file ? updateBlogWithBackground : updateBlogNoneBackground,
+    (err, travel) => {
+      if (err) res.status(400).send(err);
+      Travel.find({ _id: travel._id })
+        .populate("create_by", "-_id -password")
+        .populate("destination", "-_id")
+        .populate("departure", "-_id")
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_1",
+            select: "-destination",
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_2",
+            select: "-destination",
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_3",
+            select: "-destination",
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_4",
+            select: "-destination",
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_5",
+            select: "-destination",
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_6",
+            select: "-destination",
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
+            path: "schedule_detail.day_7",
+            select: "-destination",
+          },
+        })
+        .populate("member", "email display_name avatar phone")
+        .exec((err, travel_new) => {
+          if (err) res.status(400).send(err);
+          else {
+            res.status(200).json(travel_new);
+          }
+        });
+    }
+  );
+};
+
 module.exports.comment = async (req, res) => {
   const idUser = req.user.idUser;
   const user = await User.findOne({ _id: idUser });
@@ -401,7 +499,14 @@ module.exports.comment = async (req, res) => {
       { comment: [...travel.comment, new_comment] },
       (err) => {
         if (err) res.status(400).send(err);
-        res.status(200).json({ message: "Cập nhật comment thành công" });
+        Travel.findOne(
+          { _id: travel._id },
+          "comment -_id",
+          (err, newcomment) => {
+            if (err) res.status(400).send(err);
+            res.status(200).json(newcomment);
+          }
+        );
       }
     );
   });

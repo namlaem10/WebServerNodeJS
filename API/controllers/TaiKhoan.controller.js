@@ -24,20 +24,24 @@ module.exports.login = async (req, res) => {
             const travel_share = travel.filter((item) => {
               return item.isShare === true;
             });
+            const travel_have_rating = travel_share.filter((item) => {
+              return item.rating_count !== 0;
+            }).length;
             let total_rating = 0;
             let person_rating = 0;
             travel_share.map((item) => {
-              return (
-                (total_rating += item.rating),
-                (person_rating += item.rating_count)
-              );
+              if (item.rating_count !== 0)
+                return (
+                  (total_rating += item.rating),
+                  (person_rating += item.rating_count)
+                );
             });
             res.json({
               user_info: user_return,
               token: accessToken,
               total_travel: total_travel,
               travel_share: travel_share.length,
-              rating_point: Math.round(total_rating / travel_share.length),
+              rating_point: Math.round(total_rating / travel_have_rating),
               people_rating: person_rating,
             });
           }

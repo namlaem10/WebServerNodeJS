@@ -5,7 +5,7 @@ const User = require("../models/TaiKhoan.model");
 
 module.exports.all = (req, res) => {
   Travel.find({})
-    .populate("create_by", "-_id -password")
+    .populate("create_by", "-friend -password")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
     .populate({
@@ -69,8 +69,8 @@ module.exports.all = (req, res) => {
 
 module.exports.own = (req, res) => {
   const id = req.user.idUser;
-  Travel.find({ create_by: id })
-    .populate("create_by", "-_id -password")
+  Travel.find({ member: id })
+    .populate("create_by", "-friend -password")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
     .populate({
@@ -188,7 +188,7 @@ module.exports.create = async (req, res) => {
       travel.save((err) => {
         if (err) res.status(400).send(err);
         Travel.find({ _id: travel._id })
-          .populate("create_by", "-_id -password")
+          .populate("create_by", "-friend -password")
           .populate("destination", "-_id")
           .populate("departure", "-_id")
           .populate({
@@ -316,7 +316,7 @@ module.exports.update = (req, res) => {
           );
         }
         Travel.find({ _id: id })
-          .populate("create_by", "-_id -password")
+          .populate("create_by", "-friend -password")
           .populate("destination", "-_id")
           .populate("departure", "-_id")
           .populate({
@@ -419,7 +419,7 @@ module.exports.blog = (req, res) => {
     (err, travel) => {
       if (err) res.status(400).send(err);
       Travel.find({ _id: travel._id })
-        .populate("create_by", "-_id -password")
+        .populate("create_by", "-friend -password")
         .populate("destination", "-_id")
         .populate("departure", "-_id")
         .populate({

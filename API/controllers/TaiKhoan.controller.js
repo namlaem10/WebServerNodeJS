@@ -20,7 +20,9 @@ module.exports.login = async (req, res) => {
           if (err) res.status(400).send(err);
           else {
             const travel = await Travel.find({ create_by: userFind._id });
-            const total_travel = travel.length;
+            const total_travel = await Travel.countDocuments({
+              member: userFind._id,
+            });
             const travel_share = travel.filter((item) => {
               return item.isShare === true;
             });
@@ -41,7 +43,10 @@ module.exports.login = async (req, res) => {
               token: accessToken,
               total_travel: total_travel,
               travel_share: travel_share.length,
-              rating_point: Math.round(total_rating / travel_have_rating),
+              rating_point:
+                travel_share.length === 0
+                  ? 0
+                  : Math.round(total_rating / travel_have_rating),
               people_rating: person_rating,
             });
           }

@@ -5,7 +5,7 @@ const travelRoute = require("./API/routes/HanhTrinh.route");
 const destinationRoute = require("./API/routes/DiaDiem.route");
 const scheduleRoute = require("./API/routes/LichTrinh.route");
 const touristDestinationRoute = require("./API/routes/DiemThamQuan.route");
-
+const notificationRoute = require("./API/routes/Notification.route");
 const app = express();
 const port = 3000;
 
@@ -31,7 +31,7 @@ app.use("/api/travel", travelRoute);
 app.use("/api/destination", destinationRoute);
 app.use("/api/schedule", scheduleRoute);
 app.use("/api/touristdestination", touristDestinationRoute);
-
+app.use("/api/notification", notificationRoute);
 app.get("/", (req, res) => {
   res.send("Hello");
 });

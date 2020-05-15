@@ -492,6 +492,7 @@ module.exports.comment = async (req, res) => {
     content: req.body.content,
     create_at: new Date().toLocaleString(),
   };
+  console.log(new_comment);
   Travel.findById(idTravel, (err, travel) => {
     if (err) res.status(400).send(err);
     Travel.updateOne(
@@ -509,5 +510,52 @@ module.exports.comment = async (req, res) => {
         );
       }
     );
+  });
+};
+
+module.exports.rating = async (req, res) => {
+  const idUser = req.user.idUser;
+  const user = await User.findOne({ _id: idUser });
+  const idTravel = req.params.id;
+  const new_rating = {
+    avatar: user.avatar,
+    username: user.display_name,
+    rating: req.body.rating,
+    create_at: new Date().toLocaleString(),
+  };
+  Travel.findById(idTravel, (err, travel) => {
+    if (err) res.status(400).send(err);
+    else {
+      var total = 0;
+      if (travel.rating_history.length !== 0) {
+        travel.rating_history.filter((item) => {
+          if (item) return (total += item.rating);
+        });
+      }
+      Travel.updateOne(
+        { _id: idTravel },
+        {
+          rating_history: [...travel.rating_history, new_rating],
+          rating_count: travel.rating_count + 1,
+          rating:
+            total === 0
+              ? +req.body.rating
+              : Math.round(
+                  (total + +req.body.rating) / (travel.rating_count + 1)
+                ),
+        },
+        (err) => {
+          if (err) res.status(400).send(err);
+          Travel.findOne(
+            { _id: travel._id },
+            "rating rating_count rating_history -_id",
+            (err, newrating) => {
+              if (err) res.status(400).send(err);
+              res.status(200).json(newrating);
+            }
+          );
+        }
+      );
+    }
   });
 };

@@ -48,6 +48,14 @@ var travelSchema = new Schema({
       create_at: Date,
     },
   ],
+  rating_history: [
+    {
+      avatar: String,
+      username: String,
+      rating: Number,
+      create_at: Date,
+    },
+  ],
   background: String,
   isShare: Boolean,
   create_at: Date,

@@ -5,7 +5,7 @@ const controller = require("../controllers/HanhTrinh.controller");
 const auth = require("../middlewares/authMiddleware");
 
 const { authenticationMiddleware } = auth;
-const { all, own, create, update, remove, comment, blog } = controller;
+const { all, own, create, update, remove, comment, blog, rating } = controller;
 
 const route = express.Router();
 const upload = multer({ dest: "public/uploads" });
@@ -19,6 +19,8 @@ route.get("/own", authenticationMiddleware, own);
 route.put("/update/:id", authenticationMiddleware, update);
 
 route.put("/comment/:id", authenticationMiddleware, comment);
+
+route.put("/rating/:id", authenticationMiddleware, rating);
 
 route.delete("/remove/:id", authenticationMiddleware, remove);
 

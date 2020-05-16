@@ -185,3 +185,16 @@ module.exports.changepassword = (req, res) => {
     });
   }
 };
+
+module.exports.fcm = (req, res) => {
+  const id = req.user.idUser;
+  const updatefcm = {
+    fcmToken: req.body.fcm,
+  };
+  User.findByIdAndUpdate(id, updatefcm, (err, user_update) => {
+    if (err) res.status(400).send(err);
+    else {
+      res.status(200).json({ message: "Cập nhật thành công" });
+    }
+  });
+};

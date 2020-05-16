@@ -20,6 +20,7 @@ var userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  fcmToken: String,
   friend: [{ type: String, ref: "User" }],
   phone: String,
   avatar: String,

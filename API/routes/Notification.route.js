@@ -12,6 +12,6 @@ const route = express.Router();
 
 //API for mobile app
 
-route.post("/send", authenticationMiddleware, send);
+route.post("/send/:id", authenticationMiddleware, send);
 
 module.exports = route;

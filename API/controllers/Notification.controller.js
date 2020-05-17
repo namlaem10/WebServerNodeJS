@@ -79,6 +79,7 @@ module.exports.get = async (req, res) => {
         })
         .populate("member", "email display_name avatar phone");
       return {
+        _id: item._id,
         travel: travelfind,
         member_away: member_away,
       };

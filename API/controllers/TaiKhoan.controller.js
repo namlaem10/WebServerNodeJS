@@ -14,7 +14,7 @@ module.exports.login = async (req, res) => {
     });
     if (userFind) {
       const accessToken = jwt.sign({ idUser: userFind._id }, accessTokenSecret);
-      User.findOne({ _id: userFind._id }, "-password")
+      User.findOne({ _id: userFind._id }, "-password -fcmToken")
         .populate("friend", "email display_name avatar phone")
         .exec(async (err, user_return) => {
           if (err) res.status(400).send(err);

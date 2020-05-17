@@ -3,9 +3,74 @@ const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
 
+module.exports.get = (req, res) => {
+  const id = req.params.id;
+  Travel.findOne({ _id: id })
+    .populate("create_by", "-friend -password -fcmToken")
+    .populate("destination", "-_id")
+    .populate("departure", "-_id")
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_1",
+        select: "-destination",
+      },
+    })
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_2",
+        select: "-destination",
+      },
+    })
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_3",
+        select: "-destination",
+      },
+    })
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_4",
+        select: "-destination",
+      },
+    })
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_5",
+        select: "-destination",
+      },
+    })
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_6",
+        select: "-destination",
+      },
+    })
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "schedule_detail.day_7",
+        select: "-destination",
+      },
+    })
+    .populate("member", "email display_name avatar phone")
+    .sort({ create_at: -1 })
+    .exec((err, travel) => {
+      if (err) res.status(400).send(err);
+      else {
+        res.status(200).json(travel);
+      }
+    });
+};
+
 module.exports.all = (req, res) => {
   Travel.find({})
-    .populate("create_by", "-friend -password")
+    .populate("create_by", "-friend -password -fcmToken")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
     .populate({
@@ -70,7 +135,7 @@ module.exports.all = (req, res) => {
 module.exports.own = (req, res) => {
   const id = req.user.idUser;
   Travel.find({ member: id })
-    .populate("create_by", "-friend -password")
+    .populate("create_by", "-friend -password -fcmToken")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
     .populate({
@@ -188,7 +253,7 @@ module.exports.create = async (req, res) => {
       travel.save((err) => {
         if (err) res.status(400).send(err);
         Travel.find({ _id: travel._id })
-          .populate("create_by", "-friend -password")
+          .populate("create_by", "-friend -password -fcmToken")
           .populate("destination", "-_id")
           .populate("departure", "-_id")
           .populate({
@@ -316,7 +381,7 @@ module.exports.update = (req, res) => {
           );
         }
         Travel.find({ _id: id })
-          .populate("create_by", "-friend -password")
+          .populate("create_by", "-friend -password -fcmToken")
           .populate("destination", "-_id")
           .populate("departure", "-_id")
           .populate({
@@ -419,7 +484,7 @@ module.exports.blog = (req, res) => {
     (err, travel) => {
       if (err) res.status(400).send(err);
       Travel.find({ _id: travel._id })
-        .populate("create_by", "-friend -password")
+        .populate("create_by", "-friend -password -fcmToken")
         .populate("destination", "-_id")
         .populate("departure", "-_id")
         .populate({

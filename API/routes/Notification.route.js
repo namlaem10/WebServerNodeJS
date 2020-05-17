@@ -5,12 +5,13 @@ const controller = require("../controllers/Notification.controller"); // them co
 const auth = require("../middlewares/authMiddleware");
 
 const { authenticationMiddleware } = auth;
-const { send } = controller;
+const { send, get } = controller;
 
 const route = express.Router();
 // const upload = multer({ dest: "public/uploads" });
 
 //API for mobile app
+route.get("/get", authenticationMiddleware, get);
 
 route.post("/send/:id", authenticationMiddleware, send);
 

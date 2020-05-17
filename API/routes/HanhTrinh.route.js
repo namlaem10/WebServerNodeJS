@@ -5,12 +5,24 @@ const controller = require("../controllers/HanhTrinh.controller");
 const auth = require("../middlewares/authMiddleware");
 
 const { authenticationMiddleware } = auth;
-const { all, own, create, update, remove, comment, blog, rating } = controller;
+const {
+  all,
+  own,
+  create,
+  update,
+  remove,
+  comment,
+  blog,
+  rating,
+  get,
+} = controller;
 
 const route = express.Router();
 const upload = multer({ dest: "public/uploads" });
 
 //API for mobile app
+
+route.get("/get/:id", authenticationMiddleware, get);
 
 route.get("/all", authenticationMiddleware, all);
 

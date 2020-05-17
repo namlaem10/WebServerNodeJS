@@ -13,6 +13,7 @@ var notiSchema = new mongoose.Schema({
     required: true,
     ref: "Travel",
   },
+  member: [{ type: String, ref: "User", required: true }],
   member_away: [
     {
       name: {

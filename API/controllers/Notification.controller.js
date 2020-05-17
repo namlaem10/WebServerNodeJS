@@ -13,8 +13,9 @@ admin.initializeApp({
 module.exports.get = async (req, res) => {
   const id = req.user.idUser;
   const noti_find = await Notification.find({ member: id })
-    .lean()
-    .populate("member_away.name", "-_id display_name");
+    .populate("member_away.name", "-_id display_name")
+    .sort({ create_at: -1 })
+    .limit(10);
   const result = await Promise.all(
     noti_find.map(async (item) => {
       const member_away = item.member_away.map((item) => {
@@ -80,6 +81,7 @@ module.exports.get = async (req, res) => {
         .populate("member", "email display_name avatar phone");
       return {
         _id: item._id,
+        create_at: item.create_at,
         travel: travelfind,
         member_away: member_away,
       };

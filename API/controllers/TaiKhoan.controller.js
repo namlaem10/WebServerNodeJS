@@ -175,7 +175,7 @@ module.exports.changepassword = (req, res) => {
         });
       } else {
         return res.status(400).json({
-          message: "Mật khẩu không chính xác",
+          message: "Mật khẩu cũ không chính xác",
         });
       }
     });

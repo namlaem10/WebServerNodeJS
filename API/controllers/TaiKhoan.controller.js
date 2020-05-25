@@ -3,7 +3,7 @@ const fs = require("fs");
 const md5 = require("md5");
 const User = require("../models/TaiKhoan.model");
 const Travel = require("../models/HanhTrinh.model");
-
+var nodemailer = require("nodemailer");
 const accessTokenSecret = "dangcongsanvietnammuonnam";
 
 module.exports.addfriend = (req, res) => {
@@ -227,7 +227,7 @@ module.exports.changepassword = (req, res) => {
         );
       } else {
         return res.status(400).json({
-          message: "Mật khẩu không chính xác",
+          message: "Mật khẩu cũ không chính xác",
         });
       }
     });
@@ -247,6 +247,64 @@ module.exports.fcm = (req, res) => {
     if (err) res.status(400).send(err);
     else {
       res.status(200).json({ message: "Cập nhật thành công" });
+    }
+  });
+};
+function newPassword(length) {
+  var result = "";
+  var characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+module.exports.forgotpassword = (req, res) => {
+  let userEmail = req.body.email;
+  User.findOne({ email: userEmail }, (err, user) => {
+    if (err) res.status(400).send(err);
+    else {
+      if (user !== null) {
+        //Gửi mail
+        let newpassword = newPassword(6);
+        var nodemailer = require("nodemailer");
+        var transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: "travel.sharing025@gmail.com",
+            pass: "muutjqcpazrfufys",
+          },
+        });
+        var mailOptions = {
+          from: "travel.sharing025@gmail.com",
+          to: userEmail,
+          subject: "TRAVEL SHARING - QUÊN MẬT KHẨU",
+          html: `<h3 style="color: #5e9ca0;">Mật Khẩu Mới Của Bạn Là:</h3> <h2  style="color:#34D374;letter-spacing: 4px;">
+        ${newpassword}
+        </h2>
+        <h3>
+          Vui lòng truy cập ứng dụng để thay đổi mật khẩu.
+        </h3>`,
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+            res.status(400).send(error);
+          } else {
+            console.log("Email sent: " + info.response);
+            User.findByIdAndUpdate(
+              user._id,
+              { password: newpassword },
+              (err, users) => {
+                if (err) res.status(400).send(err);
+                res.status(200).json({ message: "Đã gửi email" });
+              }
+            );
+          }
+        });
+      } else {
+        res.status(404).json({ message: "Email không tồn tại" });
+      }
     }
   });
 };

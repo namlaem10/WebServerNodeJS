@@ -13,6 +13,7 @@ const {
   fcm,
   find,
   addfriend,
+  forgotpassword,
 } = controller;
 
 const route = express.Router();
@@ -34,6 +35,7 @@ route.put(
 );
 
 route.put("/fcm", authenticationMiddleware, fcm);
+route.post("/forgotpassword", forgotpassword);
 
 route.post("/find", authenticationMiddleware, find);
 

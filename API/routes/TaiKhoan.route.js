@@ -5,7 +5,14 @@ const controller = require("../controllers/TaiKhoan.controller");
 const auth = require("../middlewares/authMiddleware");
 
 const { authenticationMiddleware } = auth;
-const { changepassword, updateinfo, login, register, fcm } = controller;
+const {
+  changepassword,
+  updateinfo,
+  login,
+  register,
+  fcm,
+  forgotpassword,
+} = controller;
 
 const route = express.Router();
 const upload = multer({ dest: "public/uploads" });
@@ -26,5 +33,6 @@ route.put(
 );
 
 route.put("/fcm", authenticationMiddleware, fcm);
+route.post("/forgotpassword", forgotpassword);
 
 module.exports = route;

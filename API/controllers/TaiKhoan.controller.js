@@ -1,16 +1,63 @@
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
+const md5 = require("md5");
 const User = require("../models/TaiKhoan.model");
 const Travel = require("../models/HanhTrinh.model");
 
 const accessTokenSecret = "dangcongsanvietnammuonnam";
+
+module.exports.addfriend = (req, res) => {
+  const { friend } = req.body;
+  const id = req.user.idUser;
+  User.findOne({ _id: id }, (err, user) => {
+    if (err) res.status(400).send(err);
+    User.updateOne(
+      { _id: id },
+      {
+        friend: [...user.friend, friend],
+        update_at: new Date().toLocaleString(),
+      },
+      (err) => {
+        if (err) res.status(400).send(err);
+        else res.status(200).json({ message: "Đã thêm vào danh sách bạn bè" });
+      }
+    );
+  });
+};
+
+module.exports.find = async (req, res) => {
+  const { search } = req.query;
+  const id = req.user.idUser;
+  if (search.split("@")[1] !== undefined) {
+    const user_find = await User.find(
+      { email: search, _id: { $ne: id } },
+      "-password -fcmToken"
+    ).populate("friend", "email display_name avatar phone");
+    res.status(200).json(user_find);
+  } else if (isNaN(+search) !== true) {
+    const user_find = await User.find(
+      { phone: search, _id: { $ne: id } },
+      "-password -fcmToken"
+    ).populate("friend", "email display_name avatar phone");
+    res.status(200).json(user_find);
+  } else {
+    const user_find = await User.find(
+      {
+        display_name: new RegExp(search, "i"),
+        _id: { $ne: id },
+      },
+      "-password -fcmToken"
+    ).populate("friend", "email display_name avatar phone");
+    res.status(200).json(user_find);
+  }
+};
 
 module.exports.login = async (req, res) => {
   if (req.body) {
     const { email, password } = req.body;
     const Users = await User.find();
     const userFind = Users.find((user) => {
-      return user.email === email && user.password === password;
+      return user.email === email && user.password === md5(password);
     });
     if (userFind) {
       const accessToken = jwt.sign({ idUser: userFind._id }, accessTokenSecret);
@@ -64,11 +111,11 @@ module.exports.login = async (req, res) => {
 };
 
 module.exports.register = async (req, res) => {
-  const { email, password, displayName } = req.body;
+  const { email, password, display_name, phone } = req.body;
   if (
     email !== undefined &&
     password !== undefined &&
-    displayName !== undefined
+    display_name !== undefined
   ) {
     const user = await User.find();
     const checkEmail = user.find((u) => {
@@ -84,13 +131,14 @@ module.exports.register = async (req, res) => {
       let newUser = {
         _id: new_id < 10 ? `USER0${new_id}` : `USER${new_id}`,
         email: email,
-        display_name: displayName,
-        password: password,
+        display_name: display_name,
+        password: md5(password),
         friend: [],
         create_at: new Date().toLocaleString(),
         update_at: null,
         avatar: null,
-        phone: null,
+        phone: phone,
+        fcmToken: null,
       };
       User.create(newUser, (err) => {
         if (err) res.status(400).send(err);
@@ -166,13 +214,17 @@ module.exports.changepassword = (req, res) => {
     const id = req.user.idUser;
     User.findById(id, (err, user) => {
       if (err) res.status(400).send(err);
-      if (user.password === password) {
-        User.findByIdAndUpdate(id, { password: newpassword }, (err, users) => {
-          if (err) res.status(400).send(err);
-          res.status(200).json({
-            message: "Thay đổi mật khẩu thành công",
-          });
-        });
+      if (user.password === md5(password)) {
+        User.findByIdAndUpdate(
+          id,
+          { password: md5(newpassword) },
+          (err, users) => {
+            if (err) res.status(400).send(err);
+            res.status(200).json({
+              message: "Thay đổi mật khẩu thành công",
+            });
+          }
+        );
       } else {
         return res.status(400).json({
           message: "Mật khẩu không chính xác",

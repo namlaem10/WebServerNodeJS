@@ -11,6 +11,8 @@ const {
   login,
   register,
   fcm,
+  find,
+  addfriend,
   forgotpassword,
 } = controller;
 
@@ -34,5 +36,9 @@ route.put(
 
 route.put("/fcm", authenticationMiddleware, fcm);
 route.post("/forgotpassword", forgotpassword);
+
+route.post("/find", authenticationMiddleware, find);
+
+route.put("/addfriend", authenticationMiddleware, addfriend);
 
 module.exports = route;

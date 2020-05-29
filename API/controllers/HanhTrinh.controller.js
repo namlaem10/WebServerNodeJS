@@ -1,4 +1,5 @@
 const fs = require("fs");
+const fetch = require("node-fetch");
 const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
@@ -12,23 +13,49 @@ module.exports.saleman = async (req, res) => {
     },
     "schedule_detail _id"
   )
-    .populate("schedule_detail.day_1", "-_id location")
-    .populate("schedule_detail.day_2", "-_id location")
-    .populate("schedule_detail.day_3", "-_id location")
-    .populate("schedule_detail.day_4", "-_id location")
-    .populate("schedule_detail.day_5", "-_id location")
-    .populate("schedule_detail.day_6", "-_id location")
-    .populate("schedule_detail.day_7", "-_id location");
-  console.log(schedule.toJSON());
-  // for (let index = 1; index <= 7; index++) {
-  //   const location = Promise.all(
-  //     schedule.schedule_detail["day_" + index].map((item) => {
-  //       return item;
-  //     })
-  //   );
-  //   a.push(location);
-  // }
-  // console.log(a[0]);
+    .populate("schedule_detail.day_1", "_id location")
+    .populate("schedule_detail.day_2", "_id location")
+    .populate("schedule_detail.day_3", "_id location")
+    .populate("schedule_detail.day_4", "_id location")
+    .populate("schedule_detail.day_5", "_id location")
+    .populate("schedule_detail.day_6", "_id location")
+    .populate("schedule_detail.day_7", "_id location");
+  // console.log(schedule.toJSON());
+  const test = [
+    {
+      _id: "TQ12",
+      location: {
+        latitude: 11.9404,
+        longitude: 108.458341,
+      },
+    },
+    {
+      _id: "TQ14",
+      location: {
+        latitude: 11.93662,
+        longitude: 108.43773,
+      },
+    },
+    {
+      _id: "TQ16",
+      location: {
+        latitude: 11.94957,
+        longitude: 108.43027,
+      },
+    },
+  ];
+  const b = test[0];
+  test.shift();
+  const a = Promise.all(
+    test.map(async (item) => {
+      const link = `https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=Hkbvju0uKF1GS4Ex45IGlrxvZC7c2Vx0So2B8yPnRnU&waypoint0=geo!${b.location.latitude},${b.location.longitude}&waypoint1=geo!${item.location.latitude},${item.location.longitude}&mode=fastest;car;traffic:disabled`;
+      let response = await fetch(link);
+      let responseJson = await response.json();
+      let routes = responseJson.response.route[0];
+      return routes;
+    })
+  );
+  console.log(await a);
   res.json(schedule);
 };
 

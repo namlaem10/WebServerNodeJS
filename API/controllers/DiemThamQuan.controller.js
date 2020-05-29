@@ -68,7 +68,12 @@ module.exports.rating = (req, res) => {
             .populate("rating_history.user", "_id display_name avatar")
             .exec((err, newrating) => {
               if (err) res.status(400).send(err);
-              res.status(200).json(newrating);
+              else {
+                res.status(200).json({
+                  ...newrating.toJSON(),
+                  list_rating: array_caculator,
+                });
+              }
             });
         }
       );

@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const User = require("./TaiKhoan.model");
+const Destination = require("./DiaDiem.model");
 
 const Schema = mongoose.Schema;
 
@@ -16,6 +18,15 @@ var touristDestinationSchema = new Schema({
   tourist_destintion_name: String,
   tourist_destintion_address: String,
   tourist_destintion_image: String,
+  rating: Number,
+  rating_count: Number,
+  rating_history: [
+    {
+      user: { type: String, ref: "User" },
+      rating: Number,
+      create_at: Date,
+    },
+  ],
   create_at: Date,
   update_at: Date,
 });

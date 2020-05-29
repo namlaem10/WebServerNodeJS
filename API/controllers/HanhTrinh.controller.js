@@ -3,6 +3,35 @@ const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
 
+module.exports.saleman = async (req, res) => {
+  const schedule = await Schedule.findOne(
+    {
+      status: "suggested",
+      destination: "DALAT",
+      number_of_days: parseInt(7),
+    },
+    "schedule_detail _id"
+  )
+    .populate("schedule_detail.day_1", "-_id location")
+    .populate("schedule_detail.day_2", "-_id location")
+    .populate("schedule_detail.day_3", "-_id location")
+    .populate("schedule_detail.day_4", "-_id location")
+    .populate("schedule_detail.day_5", "-_id location")
+    .populate("schedule_detail.day_6", "-_id location")
+    .populate("schedule_detail.day_7", "-_id location");
+  console.log(schedule.toJSON());
+  // for (let index = 1; index <= 7; index++) {
+  //   const location = Promise.all(
+  //     schedule.schedule_detail["day_" + index].map((item) => {
+  //       return item;
+  //     })
+  //   );
+  //   a.push(location);
+  // }
+  // console.log(a[0]);
+  res.json(schedule);
+};
+
 module.exports.get = (req, res) => {
   const id = req.params.id;
   Travel.findOne({ _id: id })

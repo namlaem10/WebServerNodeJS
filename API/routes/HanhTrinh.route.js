@@ -15,6 +15,7 @@ const {
   blog,
   rating,
   get,
+  saleman,
 } = controller;
 
 const route = express.Router();
@@ -49,5 +50,7 @@ route.post(
   upload.single("background"),
   create
 );
+
+route.get("/saleman", authenticationMiddleware, saleman);
 
 module.exports = route;

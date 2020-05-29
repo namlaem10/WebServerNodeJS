@@ -294,7 +294,7 @@ module.exports.forgotpassword = (req, res) => {
             console.log("Email sent: " + info.response);
             User.findByIdAndUpdate(
               user._id,
-              { password: newpassword },
+              { password: md5(newpassword) },
               (err, users) => {
                 if (err) res.status(400).send(err);
                 res.status(200).json({ message: "Đã gửi email" });

@@ -27,6 +27,13 @@ var touristDestinationSchema = new Schema({
       create_at: Date,
     },
   ],
+  rating_list: [
+    {
+      user: { type: String, ref: "User" },
+      rating: Number,
+      create_at: Date,
+    },
+  ],
   create_at: Date,
   update_at: Date,
 });

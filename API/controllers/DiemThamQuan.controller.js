@@ -50,6 +50,7 @@ module.exports.rating = (req, res) => {
       const tourist_destination_update = {
         rating_history: new_rating_history,
         rating_count: array_caculator.length,
+        rating_list: array_caculator,
         rating: Math.round(
           array_caculator.reduce(function (accumulator, currentValue) {
             return accumulator + currentValue.rating;
@@ -63,16 +64,14 @@ module.exports.rating = (req, res) => {
           if (err) res.status(400).send(err);
           TouristDestination.findOne(
             { _id: tourist_destination._id },
-            "rating rating_count rating_history _id"
+            "rating rating_count rating_history rating_list _id"
           )
             .populate("rating_history.user", "_id display_name avatar")
+            .populate("rating_list.user", "_id display_name avatar")
             .exec((err, newrating) => {
               if (err) res.status(400).send(err);
               else {
-                res.status(200).json({
-                  ...newrating.toJSON(),
-                  list_rating: array_caculator,
-                });
+                res.status(200).json(newrating);
               }
             });
         }

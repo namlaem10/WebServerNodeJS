@@ -43,6 +43,20 @@ module.exports.saleman = async (req, res) => {
         longitude: 108.43027,
       },
     },
+    {
+      _id: "TQ08",
+      location: {
+        latitude: 11.977645,
+        longitude: 108.44927,
+      },
+    },
+    {
+      _id: "TQ01",
+      location: {
+        latitude: 11.94103,
+        longitude: 108.4375,
+      },
+    },
   ];
   const b = test[0];
   test.shift();
@@ -51,11 +65,14 @@ module.exports.saleman = async (req, res) => {
       const link = `https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=Hkbvju0uKF1GS4Ex45IGlrxvZC7c2Vx0So2B8yPnRnU&waypoint0=geo!${b.location.latitude},${b.location.longitude}&waypoint1=geo!${item.location.latitude},${item.location.longitude}&mode=fastest;car;traffic:disabled`;
       let response = await fetch(link);
       let responseJson = await response.json();
-      let routes = responseJson.response.route[0];
+      let routes = responseJson.response.route[0].summary.distance;
       return routes;
     })
   );
-  console.log(await a);
+  const c = await a;
+  console.log(c);
+  let i = c.indexOf(Math.min(...c));
+  console.log(i);
   res.json(schedule);
 };
 

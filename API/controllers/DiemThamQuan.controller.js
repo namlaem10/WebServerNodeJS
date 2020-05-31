@@ -4,10 +4,19 @@ const TouristDestination = require("../models/DiemThamQuan.Model");
 module.exports.destination = (req, res) => {
   const id = req.params.destination;
   if (id) {
-    TouristDestination.find({ destination: id }, (err, tourist_destination) => {
-      if (err) res.status(400).send(err);
-      else res.status(200).json(tourist_destination);
-    });
+    TouristDestination.find({ destination: id })
+      .populate({
+        path: "rating_history.user",
+        select: "_id display_name avatar",
+        options: { limit: 1 },
+      })
+      .populate("rating_list.user", "_id display_name avatar")
+      .exec((err, newrating) => {
+        if (err) res.status(400).send(err);
+        else {
+          res.status(200).json(newrating);
+        }
+      });
   } else {
     res.status(400).json({ message: "Sai cú pháp, kiểm tra và thử lại" });
   }
@@ -66,7 +75,11 @@ module.exports.rating = (req, res) => {
             { _id: tourist_destination._id },
             "rating rating_count rating_history rating_list _id"
           )
-            .populate("rating_history.user", "_id display_name avatar")
+            .populate({
+              path: "rating_history.user",
+              select: "_id display_name avatar",
+              options: { limit: 5 },
+            })
             .populate("rating_list.user", "_id display_name avatar")
             .exec((err, newrating) => {
               if (err) res.status(400).send(err);

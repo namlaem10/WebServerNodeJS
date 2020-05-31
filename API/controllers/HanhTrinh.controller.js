@@ -20,7 +20,24 @@ module.exports.saleman = async (req, res) => {
     .populate("schedule_detail.day_5", "_id location")
     .populate("schedule_detail.day_6", "_id location")
     .populate("schedule_detail.day_7", "_id location");
-  // console.log(schedule.toJSON());
+  const schedule_detail = schedule.toJSON().schedule_detail;
+  getMinLocation = async (array, new_destination) => {
+    const array_distance = Promise.all(
+      array.map(async (item) => {
+        const link = `https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=Hkbvju0uKF1GS4Ex45IGlrxvZC7c2Vx0So2B8yPnRnU&waypoint0=geo!${new_destination.location.latitude},${new_destination.location.longitude}&waypoint1=geo!${item.location.latitude},${item.location.longitude}&mode=fastest;car;traffic:disabled`;
+        let response = await fetch(link);
+        let responseJson = await response.json();
+        let routes = responseJson.response.route[0].summary.distance;
+        return routes;
+      })
+    );
+    const min_distance = await array_distance;
+    console.log(min_distance);
+    return min_distance.indexOf(Math.min(...min_distance));
+  };
+  // for (const key in schedule_detail) {
+  //   schedule_detail[key];
+  // }
   const test = [
     {
       _id: "TQ12",
@@ -60,19 +77,15 @@ module.exports.saleman = async (req, res) => {
   ];
   const b = test[0];
   test.shift();
-  const a = Promise.all(
-    test.map(async (item) => {
-      const link = `https://route.ls.hereapi.com/routing/7.2/calculateroute.json?apiKey=Hkbvju0uKF1GS4Ex45IGlrxvZC7c2Vx0So2B8yPnRnU&waypoint0=geo!${b.location.latitude},${b.location.longitude}&waypoint1=geo!${item.location.latitude},${item.location.longitude}&mode=fastest;car;traffic:disabled`;
-      let response = await fetch(link);
-      let responseJson = await response.json();
-      let routes = responseJson.response.route[0].summary.distance;
-      return routes;
-    })
-  );
-  const c = await a;
-  console.log(c);
-  let i = c.indexOf(Math.min(...c));
-  console.log(i);
+  const arr = [];
+  var xxx = [];
+  arr.push(b);
+  while (test.length > 0) {
+    var temp = await getMinLocation(test, xxx[0] || arr[0]);
+    arr.push(test[temp]);
+    xxx = test.splice(temp, 1);
+  }
+  console.log("arr: ", arr);
   res.json(schedule);
 };
 
@@ -150,6 +163,11 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_1",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+          options: { limit: 1 },
+        },
         select: "-destination",
       },
     })
@@ -157,6 +175,10 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_2",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -164,6 +186,10 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_3",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -171,6 +197,10 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_4",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -178,6 +208,10 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_5",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -185,6 +219,10 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_6",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -192,6 +230,10 @@ module.exports.all = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_7",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -215,6 +257,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_1",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -222,6 +268,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_2",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -229,6 +279,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_3",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -236,6 +290,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_4",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -243,6 +301,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_5",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -250,6 +312,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_6",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })
@@ -257,6 +323,10 @@ module.exports.own = (req, res) => {
       path: "schedule",
       populate: {
         path: "schedule_detail.day_7",
+        populate: {
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+        },
         select: "-destination",
       },
     })

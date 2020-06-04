@@ -1,0 +1,47 @@
+extends ../layouts/common
+block script
+  // Page level plugins
+  script(src='/vendor/datatables/jquery.dataTables.min.js')
+  script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
+  // Page level custom scripts
+  script(src='/js/demo/datatables-demo.js')
+block css
+  // Custom styles for this page
+  link(href='vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
+block content
+  .container-fluid
+    // Page Heading
+    h1.h3.mb-2.text-gray-800= title
+    // DataTales Example
+    .card.shadow.mb-4
+      .card-header.py-3
+        h6.m-0.font-weight-bold.text-primary Danh sách tài khoản
+      .card-body
+        .table-responsive
+          table#dataTable.table.table-bordered(width='100%', cellspacing='0')
+            thead
+              tr
+                th Tên hiển thị
+                th Email
+                th Số điện thoại
+                th Ngày tạo
+                th Ngày cập nhật
+                th 
+            tfoot
+              tr
+                th Tên hiển thị
+                th Email
+                th Số điện thoại
+                th Ngày tạo
+                th Ngày cập nhật
+                th 
+            tbody
+              each val in users
+                tr
+                  td= val.display_name
+                  td= val.email
+                  td= val.phone
+                  td= moment(val.create_at).format('DD/MM/YYYY')
+                  td= val.update_at? moment(val.update_at).format('DD/MM/YYYY') :null
+                  td &nbsp;
+  // /.container-fluid

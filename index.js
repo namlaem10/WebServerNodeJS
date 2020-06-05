@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const userRoute = require("./API/routes/TaiKhoan.route");
@@ -35,7 +36,6 @@ app.use("/api/notification", notificationRoute);
 app.get("/", (req, res) => {
   res.send("Hello");
 });
-
 app.listen(port, () => {
   console.log("Start port " + port);
 });

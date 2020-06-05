@@ -104,9 +104,10 @@ module.exports.send = async (req, res) => {
     const registrationToken = fcmTokenArray.filter((item) => {
       return item != null;
     });
-    const lastest = await Notification.findOne().sort({ _id: -1 });
+    const all_noti = await Notification.find();
+    const lastest_id = all_noti.reverse();
     const new_id =
-      lastest === null ? 1 : parseInt(lastest._id.split("B")[1]) + 1;
+      all_noti === [] ? 1 : parseInt(lastest_id[0]._id.split("B")[1]) + 1;
     const noti = new Notification({
       _id: new_id < 10 ? `TB0${new_id}` : `TB${new_id}`,
       travel: id,

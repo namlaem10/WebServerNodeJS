@@ -59,6 +59,7 @@ var travelSchema = new Schema({
   background: String,
   isShare: Boolean,
   create_at: Date,
+  share_at: Date,
   update_at: Date,
 });
 var Travel = mongoose.model("Travel", travelSchema, "HanhTrinh");

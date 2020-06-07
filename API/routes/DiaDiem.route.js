@@ -3,7 +3,9 @@ const multer = require("multer");
 
 const controller = require("../controllers/DiaDiem.controller");
 const auth = require("../middlewares/authMiddleware");
+const cloudinary = require("../middlewares/cloudinaryMiddleware");
 
+const { uploadCloudinaryMiddleware } = cloudinary;
 const { authenticationMiddleware } = auth;
 const { all, update } = controller;
 
@@ -18,6 +20,7 @@ route.put(
   "/update/:id",
   authenticationMiddleware,
   upload.single("destination_image"),
+  uploadCloudinaryMiddleware,
   update
 );
 

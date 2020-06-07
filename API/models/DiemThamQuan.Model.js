@@ -15,9 +15,9 @@ var touristDestinationSchema = new Schema({
     ref: "Destination",
     required: true,
   },
-  tourist_destintion_name: String,
-  tourist_destintion_address: String,
-  tourist_destintion_image: String,
+  tourist_destination_name: String,
+  tourist_destination_address: String,
+  tourist_destination_image: String,
   rating: Number,
   rating_count: Number,
   rating_history: [

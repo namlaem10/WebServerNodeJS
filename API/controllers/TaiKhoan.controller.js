@@ -138,7 +138,7 @@ module.exports.register = async (req, res) => {
         friend: [],
         create_at: new Date().toLocaleString(),
         update_at: null,
-        avatar: null,
+        avatar: `https://res.cloudinary.com/namlaem/image/upload/v1591552158/Travel%20Sharing/avatar_ad9mib.png`,
         phone: phone,
         fcmToken: null,
       };
@@ -158,20 +158,9 @@ module.exports.register = async (req, res) => {
 
 module.exports.updateinfo = (req, res) => {
   const { displayName, phone } = req.body;
+  const url = req.url;
   if (phone !== undefined && displayName !== undefined) {
     const id = req.user.idUser;
-    if (req.file) {
-      const tempPath = req.file.path;
-      const targetName = `public/uploads/${req.file.filename}.${
-        req.file.mimetype.split("/")[1]
-      }`;
-      fs.rename(tempPath, targetName, (err) => {
-        if (err)
-          res.status(500).json({
-            message: "Oops! Something went wrong!",
-          });
-      });
-    }
     const userUpdateNonAvt = {
       display_name: displayName,
       phone: phone,
@@ -179,9 +168,7 @@ module.exports.updateinfo = (req, res) => {
     const userUpdate = {
       display_name: displayName,
       phone: phone,
-      avatar: req.file
-        ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
-        : null,
+      avatar: url,
     };
     User.findByIdAndUpdate(
       id,
@@ -268,7 +255,7 @@ module.exports.changepassword = (req, res) => {
 module.exports.fcm = (req, res) => {
   const id = req.user.idUser;
   const updatefcm = {
-    fcmToken: req.body.fcm,
+    fcmToken: req.body.fcm === "null" ? null : req.body.fcm,
   };
   User.findByIdAndUpdate(id, updatefcm, (err, user_update) => {
     if (err) res.status(400).send(err);

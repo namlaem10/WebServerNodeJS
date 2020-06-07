@@ -1,6 +1,34 @@
 const fs = require("fs");
 const TouristDestination = require("../models/DiemThamQuan.Model");
 
+module.exports.uploadimage = (req, res) => {
+  const url = req.url;
+  const idTouristDestination = req.params.id;
+  const image_upload = {
+    tourist_destination_image: url,
+  };
+  TouristDestination.updateOne(
+    { _id: idTouristDestination },
+    image_upload,
+    (err) => {
+      if (err) res.status(400).send(err);
+      TouristDestination.findOne({ _id: idTouristDestination })
+        .populate({
+          path: "rating_history.user",
+          select: "_id display_name avatar",
+          options: { limit: 5 },
+        })
+        .populate("rating_list.user", "_id display_name avatar")
+        .exec((err, tourist_update) => {
+          if (err) res.status(400).send(err);
+          else {
+            res.status(200).json(tourist_update);
+          }
+        });
+    }
+  );
+};
+
 module.exports.destination = (req, res) => {
   const id = req.params.destination;
   if (id) {

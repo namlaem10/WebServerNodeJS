@@ -206,7 +206,7 @@ module.exports.all = (req, res) => {
       },
     })
     .populate("member", "email display_name avatar phone")
-    .sort({ create_at: -1 })
+    .sort({ share_at: -1 })
     .exec((err, travel) => {
       if (err) res.status(400).send(err);
       else {
@@ -310,21 +310,10 @@ module.exports.own = (req, res) => {
 
 module.exports.create = async (req, res) => {
   const id = req.user.idUser;
+  const url = req.url;
   const member = req.body.member ? req.body.member : [];
   member.unshift(id);
   if (req.body) {
-    if (req.file) {
-      const tempPath = req.file.path;
-      const targetName = `public/uploads/${req.file.filename}.${
-        req.file.mimetype.split("/")[1]
-      }`;
-      fs.rename(tempPath, targetName, (err) => {
-        if (err)
-          res.status(500).json({
-            message: "Oops! Something went wrong!",
-          });
-      });
-    }
     const all_schedule = await Schedule.find();
     const lastest_id = all_schedule.reverse();
     const new_id =
@@ -361,9 +350,8 @@ module.exports.create = async (req, res) => {
         update_at: null,
         isShare: false,
         create_by: id,
-        background: req.file
-          ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
-          : null,
+        background: url,
+        share_at: null,
       });
       travel.save((err) => {
         if (err) res.status(400).send(err);
@@ -462,8 +450,11 @@ module.exports.remove = (req, res) => {
 
 module.exports.update = (req, res) => {
   const idUser = req.user.idUser;
-  const member = req.body.member ? req.body.member : [];
-  console.log(req.body);
+  const member = req.body.member
+    ? req.body.member[0] === "null"
+      ? []
+      : req.body.member
+    : [];
   member.unshift(idUser);
   const id = req.params.id;
   if (id) {
@@ -566,25 +557,13 @@ module.exports.update = (req, res) => {
 
 module.exports.blog = (req, res) => {
   const idTravel = req.params.id;
-  if (req.file) {
-    const tempPath = req.file.path;
-    const targetName = `public/uploads/${req.file.filename}.${
-      req.file.mimetype.split("/")[1]
-    }`;
-    fs.rename(tempPath, targetName, (err) => {
-      if (err)
-        res.status(500).json({
-          message: "Oops! Something went wrong!",
-        });
-    });
-  }
+  const url = req.url;
   const updateBlogWithBackground = {
     title: req.body.title,
     description: req.body.description,
-    background: req.file
-      ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
-      : null,
+    background: url,
     isShare: true,
+    share_at: new Date().toLocaleString(),
     update_at: new Date().toLocaleString(),
   };
   const updateBlogNoneBackground = {

@@ -8,7 +8,7 @@ cloudinary.config({
 });
 
 module.exports.uploadCloudinaryMiddleware = (req, res, next) => {
-  if (req.file.path) {
+  if (req.file) {
     cloudinary.uploader.upload(
       req.file.path,
       { folder: "Travel Sharing" },

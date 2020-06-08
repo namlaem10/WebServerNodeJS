@@ -578,6 +578,7 @@ module.exports.blog = (req, res) => {
     title: req.body.title,
     description: req.body.description,
     isShare: true,
+    share_at: new Date().toLocaleString(),
     update_at: new Date().toLocaleString(),
   };
   Travel.findByIdAndUpdate(

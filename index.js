@@ -37,5 +37,5 @@ app.get("/", (req, res) => {
   res.send("Hello");
 });
 app.listen(process.env.PORT || port, () => {
-  console.log("Server is running...");
+  console.log("Server is running..." + process.env.PORT + "or" + port);
 });

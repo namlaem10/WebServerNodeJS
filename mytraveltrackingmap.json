@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "mytraveltrackingmap",
+  "private_key_id": "db7e59378328617e28eae67a28a399880cfce745",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDXcsTaooMA4v3Y\n5V63GgdBCMnrCQ/ph4BrLXeG+Q5He9w9GQVn4NDrBf0o6DHKIWDp3whCjSTnutBK\na0pWClv8kNGnyvhOVf+gHVDAAfu11UkRMtXPgm58auLm4XzgLy/zu1cDq4qawrfu\nbyfHYZjqwhlSQoXqk12XtCrY/nUxRTDkTa2h1tZIQUvhhHM1OUIRghW+z4Y6t6zf\n9gzZ12JW0YYGTZ/cHC6zo5E3Qf07n7m8xgmLuqRaEr6YkVhTilqFIHom6uAmnrjw\na0QZ5dFfvhVdaUB9qxFFKbjFK9NcU5gEwl51KELOqcE/Kl3wC/D6HjJzr65CtpVt\nEUVxdsufAgMBAAECggEAIR4ZOGpmrMo3rxGC/65Wkx6guypHceRMTy1MBElgcoiN\nkC66b/9U3eurwJAAp0t+NDT+dgxwMda7kdTwNk2dWjOApsRCavg5NQmMkhc78/V3\nJ9eimiU4ipN7kXXz1hoqytJvS7cgtS1dTJ91g+ZytRNlBQoIv8grSNh/BaAHr6zk\n1IEQHQZcmVqws8AmkOi7iZYcVUy4uRdKLxzM7SsW13eHUrnHoaulQCjI8q2ibepq\n+G5xW1Watt/pT2eKn3JkZxK5cn0rs6zu/3OQQordFstdF/Ll0ZrFD2z7DLKm0LSo\nOc/AcEl/61Sn36K+sO9L8TiWXRmfrOuC1uP+7wkdYQKBgQD1LCuIhc0xpqPWGFIK\ngH38Gahw40lrJnra7CtF2ekxiRsCpESc+hyP373mgJeM5etGRqMSmCzGZjgm03nc\nkAiz3qdpi2eUUkPBfuNZ2uG0tgEdN8h5Mp5LxTvyEfs990mrK9J3rtiMAWAZjKcu\nNgq5ICkwHDiDvC1OvEMXy/qfRwKBgQDg9ow/5DiQKA/3BRi8IcRB/uxza7w7j280\nfVjuSZLpILLvepse85oaB6KNGMq8EuaXeVp4QMg2K7GFvqqRL69Lb1nlh17zx/Ar\nHyGQIfeRXQiMHOL1BZwG9LiaL7dHf3sJF/WWXsjffaHNzs4+uk9c8I9sNz5TRcGl\nXYjb5TeM6QKBgDj4q6EM3pLEE1xDyISyORRk7fRVjJD+nxvSN3gC3CJrpsAlZeBI\namywZFN03EKchuCMt4YxoG32AORczfuH6M3LVoG7KDWaLC6BitkteLdid73PYaFw\nNsKKsZRdw1Ex7od9JmozUhSumSM2wP6HBlTgeVG5rRRHnQunybt05ecvAoGALCLz\nHU3vcwkJKNPNKIwPb0tOpM6MXbskfE3jdszkj+ykbqvFZ2sv3s+Eqt4kWIX0y985\nSsKbBVXJPI5N9LJAWDJ+lrPag0XE7xDqita/NbvlA2hfduck15CH72hRMyvlvcD/\npALwsjh52GEswc3X6EoiOX8VMU1MUt9pDIuKPJECgYEA8KtaMFzOB07EUB87ZG1L\nyjFrbwEi29EL+NlyHUYq7iDdfpxkv570Qe0ZBfF88IJ5u8mtBsUWUcSo6x4ZQgoJ\nqop2Oh4HGf1Z6M+21A7XeYfuVIaYjfGNYHmJo7U8YWqGOnqcEdr86f721++RJQ55\nGz1Ikd6GE2nLkvvhCNM5au4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-wnxll@mytraveltrackingmap.iam.gserviceaccount.com",
+  "client_id": "112286521049776321318",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-wnxll%40mytraveltrackingmap.iam.gserviceaccount.com"
+}

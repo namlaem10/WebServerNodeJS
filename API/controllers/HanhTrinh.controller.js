@@ -317,7 +317,9 @@ module.exports.create = async (req, res) => {
     const all_schedule = await Schedule.find();
     const lastest_id = all_schedule.reverse();
     const new_id =
-      all_schedule === [] ? 1 : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
+      all_schedule.length === 0
+        ? 1
+        : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
     const schedule = new Schedule({
       _id: new_id < 10 ? `LT0${new_id}` : `LT${new_id}`,
       destination: req.body.destination,
@@ -332,7 +334,9 @@ module.exports.create = async (req, res) => {
       const all_travel = await Travel.find();
       const lastest_id = all_travel.reverse();
       const new_id =
-        all_travel === [] ? 1 : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
+        all_travel.length === 0
+          ? 1
+          : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
       const travel = new Travel({
         _id: new_id < 10 ? `HT0${new_id}` : `HT${new_id}`,
         departure: req.body.departure,

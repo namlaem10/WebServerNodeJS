@@ -107,7 +107,7 @@ module.exports.send = async (req, res) => {
     const all_noti = await Notification.find();
     const lastest_id = all_noti.reverse();
     const new_id =
-      all_noti === [] ? 1 : parseInt(lastest_id[0]._id.split("B")[1]) + 1;
+      all_noti.length === 0 ? 1 : parseInt(lastest_id[0]._id.split("B")[1]) + 1;
     const noti = new Notification({
       _id: new_id < 10 ? `TB0${new_id}` : `TB${new_id}`,
       travel: id,

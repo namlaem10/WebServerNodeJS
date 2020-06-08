@@ -129,7 +129,9 @@ module.exports.register = async (req, res) => {
       const all_user = await User.find();
       const lastest_id = all_user.reverse();
       const new_id =
-        all_user === [] ? 1 : parseInt(lastest_id[0]._id.split("R")[1]) + 1;
+        all_user.length === 0
+          ? 1
+          : parseInt(lastest_id[0]._id.split("R")[1]) + 1;
       let newUser = {
         _id: new_id < 10 ? `USER0${new_id}` : `USER${new_id}`,
         email: email,

@@ -36,6 +36,6 @@ app.use("/api/notification", notificationRoute);
 app.get("/", (req, res) => {
   res.send("Hello");
 });
-app.listen(port, () => {
-  console.log("Start port " + port);
+app.listen(process.env.PORT || port, () => {
+  console.log("Server is running...");
 });

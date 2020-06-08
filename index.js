@@ -11,7 +11,7 @@ const app = express();
 const port = 3000;
 
 // Connection MongoDB
-mongoose.connect("mongodb://localhost/TravelSharing", {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,

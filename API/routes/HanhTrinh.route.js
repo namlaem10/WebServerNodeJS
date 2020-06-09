@@ -48,13 +48,7 @@ route.put(
   blog
 );
 
-route.post(
-  "/create",
-  authenticationMiddleware,
-  upload.single("background"),
-  uploadCloudinaryMiddleware,
-  create
-);
+route.post("/create", authenticationMiddleware, create);
 
 route.get("/saleman", authenticationMiddleware, saleman);
 

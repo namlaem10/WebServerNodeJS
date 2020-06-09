@@ -8,17 +8,19 @@ cloudinary.config({
 });
 
 module.exports.uploadCloudinaryMiddleware = (req, res, next) => {
-  cloudinary.uploader.upload(
-    req.file.path,
-    { folder: "Travel Sharing" },
-    (err, result) => {
-      if (err) res.status(400).send(err);
-      else if (result) {
-        fs.unlinkSync(req.file.path);
-        console.log("result", result);
-        req.url = result.secure_url;
-        next();
+  if (req.file) {
+    cloudinary.uploader.upload(
+      req.file.path,
+      { folder: "Travel Sharing" },
+      (err, result) => {
+        if (err) res.status(400).send(err);
+        else if (result) {
+          fs.unlinkSync(req.file.path);
+          console.log("result", result);
+          req.url = result.secure_url;
+          next();
+        }
       }
-    }
-  );
+    );
+  } else next();
 };

@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
+const Destination = require("../models/DiaDiem.model");
 
 module.exports.saleman = async (req, res) => {
   const schedule = await Schedule.findOne(
@@ -310,7 +311,10 @@ module.exports.own = (req, res) => {
 
 module.exports.create = async (req, res) => {
   const id = req.user.idUser;
-  const url = req.url;
+  const destination = await Destination.findOne(
+    { _id: req.body.destination },
+    "destination_image"
+  );
   const member = req.body.member ? req.body.member : [];
   member.unshift(id);
   if (req.body) {
@@ -354,7 +358,7 @@ module.exports.create = async (req, res) => {
         update_at: null,
         isShare: false,
         create_by: id,
-        background: url,
+        background: destination.toJSON().destination_image,
         share_at: null,
       });
       travel.save((err) => {

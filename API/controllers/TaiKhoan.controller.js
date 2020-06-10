@@ -140,6 +140,8 @@ module.exports.register = async (req, res) => {
         friend: [],
         create_at: new Date().toLocaleString(),
         update_at: null,
+        role: 0,
+        status: 1,
         avatar: `https://res.cloudinary.com/namlaem/image/upload/v1591552158/Travel%20Sharing/avatar_ad9mib.png`,
         phone: phone,
         fcmToken: null,

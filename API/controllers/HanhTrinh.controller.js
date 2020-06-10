@@ -330,6 +330,9 @@ module.exports.create = async (req, res) => {
       number_of_days: Object.keys(req.body.schedule_detail).length,
       schedule_detail: req.body.schedule_detail,
       status: "created",
+      copy_reference:
+        req.body.copy_reference === "null" ? null : req.body.copy_reference,
+      copy_list: [],
       create_at: new Date().toLocaleString(),
       update_at: null,
     });
@@ -358,6 +361,7 @@ module.exports.create = async (req, res) => {
         update_at: null,
         isShare: false,
         create_by: id,
+        is_hidden: false,
         background: destination.toJSON().destination_image,
         share_at: null,
       });

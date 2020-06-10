@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const userRoute = require("./API/routes/TaiKhoan.route");
@@ -64,6 +65,6 @@ app.get("/logout", auth, logout);
 
 app.use("/user", auth, webUserRoute);
 
-app.listen(port, () => {
-  console.log("Start port " + port);
+app.listen(process.env.PORT || port, () => {
+  console.log("Server is running...");
 });

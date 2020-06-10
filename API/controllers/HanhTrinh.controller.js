@@ -3,6 +3,7 @@ const fetch = require("node-fetch");
 const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
+const Destination = require("../models/DiaDiem.model");
 
 module.exports.saleman = async (req, res) => {
   const schedule = await Schedule.findOne(
@@ -35,58 +36,26 @@ module.exports.saleman = async (req, res) => {
     console.log(min_distance);
     return min_distance.indexOf(Math.min(...min_distance));
   };
-  // for (const key in schedule_detail) {
-  //   schedule_detail[key];
-  // }
-  const test = [
-    {
-      _id: "TQ12",
-      location: {
-        latitude: 11.9404,
-        longitude: 108.458341,
-      },
-    },
-    {
-      _id: "TQ14",
-      location: {
-        latitude: 11.93662,
-        longitude: 108.43773,
-      },
-    },
-    {
-      _id: "TQ16",
-      location: {
-        latitude: 11.94957,
-        longitude: 108.43027,
-      },
-    },
-    {
-      _id: "TQ08",
-      location: {
-        latitude: 11.977645,
-        longitude: 108.44927,
-      },
-    },
-    {
-      _id: "TQ01",
-      location: {
-        latitude: 11.94103,
-        longitude: 108.4375,
-      },
-    },
-  ];
-  const b = test[0];
-  test.shift();
-  const arr = [];
-  var xxx = [];
-  arr.push(b);
-  while (test.length > 0) {
-    var temp = await getMinLocation(test, xxx[0] || arr[0]);
-    arr.push(test[temp]);
-    xxx = test.splice(temp, 1);
+  for (const key in schedule_detail) {
+    console.log(schedule_detail[key]);
+    if (schedule_detail[key].length > 0) {
+      const place_start = schedule_detail[key][0];
+      schedule_detail[key].shift();
+      const distance_sort = [];
+      var temp_array = [];
+      distance_sort.push(place_start);
+      while (schedule_detail[key].length > 0) {
+        var temp = await getMinLocation(
+          schedule_detail[key],
+          temp_array[0] || distance_sort[0]
+        );
+        distance_sort.push(schedule_detail[key][temp]);
+        temp_array = schedule_detail[key].splice(temp, 1);
+      }
+      console.log("distance_sort: ", distance_sort);
+    }
   }
-  console.log("arr: ", arr);
-  res.json(schedule);
+  res.json(new_schedule_detail);
 };
 
 module.exports.get = (req, res) => {
@@ -238,7 +207,7 @@ module.exports.all = (req, res) => {
       },
     })
     .populate("member", "email display_name avatar phone")
-    .sort({ create_at: -1 })
+    .sort({ share_at: -1 })
     .exec((err, travel) => {
       if (err) res.status(400).send(err);
       else {
@@ -342,36 +311,39 @@ module.exports.own = (req, res) => {
 
 module.exports.create = async (req, res) => {
   const id = req.user.idUser;
+  const destination = await Destination.findOne(
+    { _id: req.body.destination },
+    "destination_image"
+  );
   const member = req.body.member ? req.body.member : [];
   member.unshift(id);
   if (req.body) {
-    if (req.file) {
-      const tempPath = req.file.path;
-      const targetName = `public/uploads/${req.file.filename}.${
-        req.file.mimetype.split("/")[1]
-      }`;
-      fs.rename(tempPath, targetName, (err) => {
-        if (err)
-          res.status(500).json({
-            message: "Oops! Something went wrong!",
-          });
-      });
-    }
-    const lastest = await Schedule.findOne().sort({ _id: -1 });
-    const new_id = parseInt(lastest._id.split("T")[1]) + 1;
+    const all_schedule = await Schedule.find();
+    const lastest_id = all_schedule.reverse();
+    const new_id =
+      all_schedule.length === 0
+        ? 1
+        : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
     const schedule = new Schedule({
       _id: new_id < 10 ? `LT0${new_id}` : `LT${new_id}`,
       destination: req.body.destination,
       number_of_days: Object.keys(req.body.schedule_detail).length,
       schedule_detail: req.body.schedule_detail,
       status: "created",
+      copy_reference:
+        req.body.copy_reference === "null" ? null : req.body.copy_reference,
+      copy_list: [],
       create_at: new Date().toLocaleString(),
       update_at: null,
     });
     schedule.save(async (err) => {
       if (err) res.status(400).send(err);
-      const lastest = await Travel.findOne().sort({ _id: -1 });
-      const new_id = parseInt(lastest._id.split("T")[1]) + 1;
+      const all_travel = await Travel.find();
+      const lastest_id = all_travel.reverse();
+      const new_id =
+        all_travel.length === 0
+          ? 1
+          : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
       const travel = new Travel({
         _id: new_id < 10 ? `HT0${new_id}` : `HT${new_id}`,
         departure: req.body.departure,
@@ -389,9 +361,9 @@ module.exports.create = async (req, res) => {
         update_at: null,
         isShare: false,
         create_by: id,
-        background: req.file
-          ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
-          : null,
+        is_hidden: false,
+        background: destination.toJSON().destination_image,
+        share_at: null,
       });
       travel.save((err) => {
         if (err) res.status(400).send(err);
@@ -490,8 +462,11 @@ module.exports.remove = (req, res) => {
 
 module.exports.update = (req, res) => {
   const idUser = req.user.idUser;
-  const member = req.body.member ? req.body.member : [];
-  console.log(req.body);
+  const member = req.body.member
+    ? req.body.member[0] === "null"
+      ? []
+      : req.body.member
+    : [];
   member.unshift(idUser);
   const id = req.params.id;
   if (id) {
@@ -594,25 +569,13 @@ module.exports.update = (req, res) => {
 
 module.exports.blog = (req, res) => {
   const idTravel = req.params.id;
-  if (req.file) {
-    const tempPath = req.file.path;
-    const targetName = `public/uploads/${req.file.filename}.${
-      req.file.mimetype.split("/")[1]
-    }`;
-    fs.rename(tempPath, targetName, (err) => {
-      if (err)
-        res.status(500).json({
-          message: "Oops! Something went wrong!",
-        });
-    });
-  }
+  const url = req.url;
   const updateBlogWithBackground = {
     title: req.body.title,
     description: req.body.description,
-    background: req.file
-      ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
-      : null,
+    background: url,
     isShare: true,
+    share_at: new Date().toLocaleString(),
     update_at: new Date().toLocaleString(),
   };
   const updateBlogNoneBackground = {

@@ -3,6 +3,9 @@ const multer = require("multer");
 
 const controller = require("../controllers/HanhTrinh.controller");
 const auth = require("../middlewares/authMiddleware");
+const cloudinary = require("../middlewares/cloudinaryMiddleware");
+
+const { uploadCloudinaryMiddleware } = cloudinary;
 
 const { authenticationMiddleware } = auth;
 const {
@@ -41,15 +44,11 @@ route.put(
   "/blog/:id",
   authenticationMiddleware,
   upload.single("background"),
+  uploadCloudinaryMiddleware,
   blog
 );
 
-route.post(
-  "/create",
-  authenticationMiddleware,
-  upload.single("background"),
-  create
-);
+route.post("/create", authenticationMiddleware, create);
 
 route.get("/saleman", authenticationMiddleware, saleman);
 

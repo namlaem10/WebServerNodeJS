@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const User = require("./TaiKhoan.model");
 
 var scheduleSchema = new mongoose.Schema({
   _id: {
@@ -21,6 +22,11 @@ var scheduleSchema = new mongoose.Schema({
     day_6: [{ type: String, ref: "TouristDesination" }],
     day_7: [{ type: String, ref: "TouristDesination" }],
   },
+  copy_reference: {
+    type: String,
+    ref: "User",
+  },
+  copy_list: [{ type: String, ref: "User" }],
   status: String,
   create_at: Date,
   update_at: Date,

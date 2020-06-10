@@ -10,26 +10,13 @@ module.exports.all = (req, res) => {
 
 module.exports.update = (req, res) => {
   const id = req.params.id;
+  const url = req.url;
   if (req.body) {
-    if (req.file) {
-      const tempPath = req.file.path;
-      const targetName = `public/uploads/${req.file.filename}.${
-        req.file.mimetype.split("/")[1]
-      }`;
-      fs.rename(tempPath, targetName, (err) => {
-        if (err)
-          res.status(500).json({
-            message: "Oops! Something went wrong!",
-          });
-      });
-    }
     const destination_update_image = {
       destination_name: req.body.destination_name,
       longitude: req.body.longitude,
       latitude: req.body.latitude,
-      destination_image: `uploads/${req.file.filename}.${
-        req.file.mimetype.split("/")[1]
-      }`,
+      destination_image: url,
       update_at: new Date().toLocaleString(),
     };
     const destination_update_non_image = {

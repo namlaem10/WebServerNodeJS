@@ -126,8 +126,12 @@ module.exports.register = async (req, res) => {
         message: "Email đã tồn tại",
       });
     } else {
-      const lastest = await User.findOne().sort({ _id: -1 });
-      const new_id = parseInt(lastest._id.split("R")[1]) + 1;
+      const all_user = await User.find();
+      const lastest_id = all_user.reverse();
+      const new_id =
+        all_user.length === 0
+          ? 1
+          : parseInt(lastest_id[0]._id.split("R")[1]) + 1;
       let newUser = {
         _id: new_id < 10 ? `USER0${new_id}` : `USER${new_id}`,
         email: email,
@@ -136,7 +140,9 @@ module.exports.register = async (req, res) => {
         friend: [],
         create_at: new Date().toLocaleString(),
         update_at: null,
-        avatar: null,
+        role: 0,
+        status: 1,
+        avatar: `https://res.cloudinary.com/namlaem/image/upload/v1591552158/Travel%20Sharing/avatar_ad9mib.png`,
         phone: phone,
         fcmToken: null,
       };
@@ -156,20 +162,9 @@ module.exports.register = async (req, res) => {
 
 module.exports.updateinfo = (req, res) => {
   const { displayName, phone } = req.body;
+  const url = req.url;
   if (phone !== undefined && displayName !== undefined) {
     const id = req.user.idUser;
-    if (req.file) {
-      const tempPath = req.file.path;
-      const targetName = `public/uploads/${req.file.filename}.${
-        req.file.mimetype.split("/")[1]
-      }`;
-      fs.rename(tempPath, targetName, (err) => {
-        if (err)
-          res.status(500).json({
-            message: "Oops! Something went wrong!",
-          });
-      });
-    }
     const userUpdateNonAvt = {
       display_name: displayName,
       phone: phone,
@@ -177,9 +172,7 @@ module.exports.updateinfo = (req, res) => {
     const userUpdate = {
       display_name: displayName,
       phone: phone,
-      avatar: req.file
-        ? `uploads/${req.file.filename}.${req.file.mimetype.split("/")[1]}`
-        : null,
+      avatar: url,
     };
     User.findByIdAndUpdate(
       id,
@@ -187,17 +180,42 @@ module.exports.updateinfo = (req, res) => {
       (err, user) => {
         if (err) res.status(400).send(err);
         else {
-          User.findById(id, (err, usernew) => {
-            if (err) res.status(400).send(err);
-            else {
-              res.status(200).json({
-                email: usernew.email,
-                display_name: usernew.display_name,
-                avatar: usernew.avatar,
-                phone: usernew.phone,
-              });
-            }
-          });
+          User.findOne({ _id: id }, "-password -fcmToken")
+            .populate("friend", "email display_name avatar phone")
+            .exec(async (err, user_return) => {
+              if (err) res.status(400).send(err);
+              else {
+                const travel = await Travel.find({ create_by: id });
+                const total_travel = await Travel.countDocuments({
+                  member: id,
+                });
+                const travel_share = travel.filter((item) => {
+                  return item.isShare === true;
+                });
+                const travel_have_rating = travel_share.filter((item) => {
+                  return item.rating_count !== 0;
+                }).length;
+                let total_rating = 0;
+                let person_rating = 0;
+                travel_share.map((item) => {
+                  if (item.rating_count !== 0)
+                    return (
+                      (total_rating += item.rating),
+                      (person_rating += item.rating_count)
+                    );
+                });
+                res.json({
+                  user_info: user_return,
+                  total_travel: total_travel,
+                  travel_share: travel_share.length,
+                  rating_point:
+                    travel_share.length === 0
+                      ? 0
+                      : Math.round(total_rating / travel_have_rating),
+                  people_rating: person_rating,
+                });
+              }
+            });
         }
       }
     );
@@ -241,7 +259,7 @@ module.exports.changepassword = (req, res) => {
 module.exports.fcm = (req, res) => {
   const id = req.user.idUser;
   const updatefcm = {
-    fcmToken: req.body.fcm,
+    fcmToken: req.body.fcm === "null" ? null : req.body.fcm,
   };
   User.findByIdAndUpdate(id, updatefcm, (err, user_update) => {
     if (err) res.status(400).send(err);

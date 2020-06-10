@@ -5,17 +5,12 @@ const app = express();
 app.set("view engine", "pug");
 app.set("views", "./views");
 const controller = require("../controllers/TaiKhoan.controller");
+const middlewares = require("../middlewares/middle.mid");
 // const auth = require("../middlewares/authMiddleware");
 // const { authenticationMiddleware } = auth;
-const {
-  index,
-  search,
-  createGetUser,
-  createPostUser,
-  userinfo,
-  login,
-} = controller;
+const { index, search, createGetUser, createPostUser, userinfo } = controller;
 
+const { checkCookie } = middlewares;
 const route = express.Router();
 const upload = multer({ dest: "public/uploads" });
 // route.post("/login", login);
@@ -33,5 +28,5 @@ route.get("/search", search);
 route.get("/create", createGetUser);
 route.post("/create", createPostUser);
 route.get("/:id", userinfo);
-route.post("/login", login);
+
 module.exports = route;

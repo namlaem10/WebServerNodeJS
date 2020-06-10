@@ -30,14 +30,14 @@ html
                     if error
                       .text-center
                       p(style="color:red;")= error
-                    form.user( action="/user/login" method="POST")
+                    form.user( action="/login" method="POST")
                       .form-group
-                        input#exampleInputEmail.form-control.form-control-user(name="email" type='email', aria-describedby='emailHelp', placeholder='Enter Email Address...')
+                        input#exampleInputEmail.form-control.form-control-user(name="email" type='email', aria-describedby='emailHelp', placeholder='Nhập tài khoản' required)
                       .form-group
-                        input#exampleInputPassword.form-control.form-control-user(name="password" type='password', placeholder='Password')
+                        input#exampleInputPassword.form-control.form-control-user(name="password" type='password', placeholder='Password' required)
                       .form-group
                       .custom-control.custom-checkbox.small
-                        input#customCheck.custom-control-input(type='checkbox')
+                        input#customCheck.custom-control-input(type='checkbox' name="checkbox")
                         label.custom-control-label(for='customCheck') Remember Me
                       button.btn.btn-primary.btn-user.btn-block(href='#' style='text-align: center;')
                         | Login 

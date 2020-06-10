@@ -6,6 +6,10 @@ const destinationRoute = require("./API/routes/DiaDiem.route");
 const scheduleRoute = require("./API/routes/LichTrinh.route");
 const touristDestinationRoute = require("./API/routes/DiemThamQuan.route");
 const notificationRoute = require("./API/routes/Notification.route");
+const CookieParser = require("cookie-parser");
+const AccountController = require("./controllers/TaiKhoan.controller");
+
+const middlewares = require("./middlewares/middle.mid");
 
 const webUserRoute = require("./routes/TaiKhoan.route");
 const app = express();
@@ -38,13 +42,27 @@ app.use("/api/touristdestination", touristDestinationRoute);
 app.use("/api/notification", notificationRoute);
 
 //Web Master UI setting
+app.use(CookieParser("vietnamvodich"));
+
 app.set("view engine", "pug");
 app.set("views", "./views");
+const { postLogin, getLogin, logout } = AccountController;
+const { auth } = middlewares;
 
 app.get("/", function (req, res) {
-  res.render("index");
+  if (req.signedCookies.rememberMe) {
+    res.redirect("/login");
+  } else if (req.signedCookies.sessionId) {
+    res.redirect("/user");
+  } else {
+    res.render("index");
+  }
 });
-app.use("/user", webUserRoute);
+app.get("/login", getLogin);
+app.post("/login", postLogin);
+app.get("/logout", auth, logout);
+
+app.use("/user", auth, webUserRoute);
 
 app.listen(port, () => {
   console.log("Start port " + port);

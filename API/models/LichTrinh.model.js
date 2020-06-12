@@ -26,7 +26,7 @@ var scheduleSchema = new mongoose.Schema({
     type: String,
     ref: "User",
   },
-  copy_list: [{ type: String, ref: "User" }],
+  copy_list: [{ type: String, ref: "TouristDesination" }],
   status: String,
   create_at: Date,
   update_at: Date,

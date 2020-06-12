@@ -336,8 +336,29 @@ module.exports.create = async (req, res) => {
       create_at: new Date().toLocaleString(),
       update_at: null,
     });
-    schedule.save(async (err) => {
+    schedule.save(async (err, newSchedule) => {
       if (err) res.status(400).send(err);
+      if (req.body.schedule_reference) {
+        Schedule.findById(
+          req.body.schedule_reference,
+          (err, schedule_reference) => {
+            if (err) res.status(400).send(err);
+            const copy_list_new = [
+              ...schedule_reference.copy_list,
+              newSchedule._id,
+            ];
+            console.log(copy_list_new);
+            Schedule.updateOne(
+              { _id: schedule_reference._id },
+              { copy_list: copy_list_new },
+              (err, Schedule_reference) => {
+                if (err) res.status(400).send(err);
+                console.log(Schedule_reference);
+              }
+            );
+          }
+        );
+      }
       const all_travel = await Travel.find();
       const lastest_id = all_travel.reverse();
       const new_id =

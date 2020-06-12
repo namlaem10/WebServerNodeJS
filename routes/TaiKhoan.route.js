@@ -8,7 +8,16 @@ const controller = require("../controllers/TaiKhoan.controller");
 const middlewares = require("../middlewares/middle.mid");
 // const auth = require("../middlewares/authMiddleware");
 // const { authenticationMiddleware } = auth;
-const { index, search, createGetUser, createPostUser, userinfo } = controller;
+const {
+  index,
+  search,
+  createGetUser,
+  createPostUser,
+  userinfo,
+  block,
+  unBlock,
+  edit,
+} = controller;
 
 const { checkCookie } = middlewares;
 const route = express.Router();
@@ -28,5 +37,8 @@ route.get("/search", search);
 route.get("/create", createGetUser);
 route.post("/create", createPostUser);
 route.get("/:id", userinfo);
+route.get("/block/:id", block);
+route.get("/unblock/:id", unBlock);
+route.post("/edit/:id", edit);
 
 module.exports = route;

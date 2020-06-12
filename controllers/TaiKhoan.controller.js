@@ -6,14 +6,15 @@ const User = require("../API/models/TaiKhoan.model");
 // var nodemailer = require("nodemailer");
 const accessTokenSecret = "dangcongsanvietnammuonnam";
 // fake data:
+
 module.exports.index = async (req, res) => {
   let userId = req.signedCookies.sessionId;
   try {
-    const user = await User.findOne({ _id: userId });
-    const listUsers = await User.find({}, "-fcmToken -password").populate(
-      "friend",
-      "email display_name avatar phone"
-    );
+    const user = await User.findOne({ _id: userId, status: 1, role: 1 });
+    const listUsers = await User.find(
+      { role: 0 },
+      "-fcmToken -password"
+    ).populate("friend", "email display_name avatar phone");
     res.render("./User/index", {
       title: "Quản lý Tài khoản",
       listUsers: listUsers,
@@ -33,11 +34,74 @@ module.exports.search = (req, res) => {
 };
 
 module.exports.userinfo = async (req, res) => {
-  const user = await User.findOne(
-    { _id: req.params.id },
-    "-fcmToken -password"
-  ).populate("friend", "email display_name avatar phone");
-  res.json(user);
+  let userId = req.signedCookies.sessionId;
+  try {
+    const user = await User.findOne({ _id: userId, status: 1, role: 1 });
+    const userEdit = await User.findOne(
+      { _id: req.params.id },
+      "-fcmToken -password"
+    ).populate("friend", "email display_name avatar phone");
+    res.render("./User/edit", {
+      title: "Chỉnh sửa tài khoản",
+      userEdit: userEdit,
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+module.exports.edit = async (req, res) => {
+  const { display_name, phone, password, repeatpassword } = req.body;
+  let userId = req.signedCookies.sessionId;
+  const userAdmin = await User.findOne({ _id: userId, status: 1, role: 1 });
+  let user = await User.findOne({ _id: req.params.id });
+  try {
+    if (password) {
+      if (password === repeatpassword) {
+        user = await User.findByIdAndUpdate(
+          { _id: req.params.id },
+          {
+            display_name: display_name,
+            phone: phone,
+            password: md5(password),
+            update_at: Date.now(),
+          }
+        );
+      } else {
+        res.render("./User/edit", {
+          title: "Chỉnh sửa tài khoản",
+          userEdit: user,
+          user: userAdmin,
+          message: "Nhập lại mật khẩu không khớp",
+          color: "color:red;",
+        });
+      }
+    } else {
+      user = await User.findByIdAndUpdate(
+        { _id: req.params.id },
+        {
+          display_name: display_name,
+          phone: phone,
+          update_at: Date.now(),
+        }
+      );
+    }
+    res.render("./User/edit", {
+      title: "Chỉnh sửa tài khoản",
+      userEdit: user,
+      user: userAdmin,
+      message: "Chỉnh sửa thành công!",
+    });
+  } catch (error) {
+    console.log(error);
+    res.render("./User/edit", {
+      title: "Chỉnh sửa tài khoản",
+      userEdit: user,
+      user: userAdmin,
+      message: "Có lỗi xảy ra! Vui lòng thử lại",
+      color: "color:red;",
+    });
+  }
 };
 
 module.exports.createGetUser = (req, res) => {
@@ -108,4 +172,28 @@ module.exports.logout = (req, res) => {
   res.clearCookie("rememberMe");
   res.clearCookie("sessionId");
   res.redirect("/");
+};
+module.exports.block = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { status: 0 }
+    );
+    res.redirect("/user");
+  } catch (error) {
+    console.log(error);
+    res.redirect("/user");
+  }
+};
+module.exports.unBlock = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      { _id: req.params.id },
+      { status: 1 }
+    );
+    res.redirect("/user");
+  } catch (error) {
+    console.log(error);
+    res.redirect("/user");
+  }
 };

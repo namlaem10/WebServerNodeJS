@@ -13,6 +13,7 @@ const AccountController = require("./controllers/TaiKhoan.controller");
 const middlewares = require("./middlewares/middle.mid");
 
 const webUserRoute = require("./routes/TaiKhoan.route");
+const webHanhTrinhRoute = require("./routes/HanhTrinh.route");
 const app = express();
 const port = 3000;
 
@@ -64,7 +65,7 @@ app.post("/login", postLogin);
 app.get("/logout", auth, logout);
 
 app.use("/user", auth, webUserRoute);
-
+app.use("/tour", auth, webHanhTrinhRoute);
 app.listen(process.env.PORT || port, () => {
   console.log("Server is running...");
 });

@@ -5,11 +5,35 @@ block script
   script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
   // Page level custom scripts
   script(src='/js/demo/datatables-demo.js')
+  script(src='/js/togged-modal.js')
 block css
   // Custom styles for this page
   link(href='vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
 block content
   .container-fluid
+    //Modal page
+    #confirm-unblock.modal.fade(tabindex='-1', role='dialog', aria-labelledby='unBlockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | Mở khóa tài khoản
+          .modal-body
+            | Bạn có chắc muốn mở khóa tài khoản này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Hủy
+            a.btn.btn-success.btn-ok(style="color:white;") Mở khóa
+
+    #confirm-block.modal.fade(tabindex='-1', role='dialog', aria-labelledby='BlockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | Khóa tài khoản
+          .modal-body
+            | Bạn có chắc muốn khóa tài khoản này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Hủy
+            a.btn.btn-danger.btn-ok(style="color:white;") Khóa
+
     // Page Heading
     .d-sm-flex.align-items-center.justify-content-between.mb-4
       h1.h3.mb-0.text-gray-800 Quản lý tài khoản
@@ -45,8 +69,11 @@ block content
                   td= val.email
                   td= val.phone
                   td= moment(val.create_at).format('DD/MM/YYYY')
-                  td= val.update_at? moment(val.update_at).format('DD/MM/YYYY') :null
+                  td= val.update_at? moment(val.update_at).format('DD/MM/YYYY') : null
                   td
-                    a(href="/user/edit") Sửa &nbsp; &nbsp;
-                    a(href="/user/block" style='color:red;') Khóa
+                    a(href="/user/"+val._id) Sửa &nbsp; &nbsp;
+                    if val.status===1
+                      a(href='#', data-href="/user/block/"+val._id, data-toggle='modal', data-target='#confirm-block' style="color:red;") khóa
+                    else
+                      a(href='#', data-href="/user/unblock/"+val._id, data-toggle='modal', data-target='#confirm-unblock' style="color:gray;") Đã khóa
   // /.container-fluid

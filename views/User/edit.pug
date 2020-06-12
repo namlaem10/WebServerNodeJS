@@ -1,0 +1,38 @@
+extends ../layouts/common
+block script
+  // Page level plugins
+  script(src='/vendor/datatables/jquery.dataTables.min.js')
+  script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
+  // Page level custom scripts
+  script(src='/js/togged-modal.js')
+block css
+  // Custom styles for this page
+  link(href='vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
+block content
+  .container-fluid
+    //Modal page
+    .d-sm-flex.align-items-center.justify-content-between.mb-4
+      a.h3.mb-0.text-800(href="/user" style="color:'#B5D5FF';") Về trang trước
+    .card-body.p-0
+      // Nested Row within Card Body
+      .row
+        .col-lg-7
+          .p-5
+            .text-center
+              h1.h4.text-gray-900.mb-4 Chỉnh sửa tài khoản
+            form.user(action="/user/edit/"+userEdit._id method="POST")
+              p#errorMessage(style=color?color:"color:green;")= message ? message:null
+              .form-group
+                input#exampleInputEmail.form-control.form-control-user(type='text', readonly=true value=userEdit.email)
+              .form-group.row
+                .col-sm-6.mb-3.mb-sm-0
+                  input#exampleFirstName.form-control.form-control-user(type='text', placeholder=userEdit.display_name required name="display_name")
+                .col-sm-6
+                  input#exampleLastName.form-control.form-control-user(type='text', placeholder=userEdit.phone required name="phone")
+              .form-group.row
+                .col-sm-6.mb-3.mb-sm-0
+                  input#exampleInputPassword.form-control.form-control-user(type='password', placeholder='Mật khẩu' name="password")
+                .col-sm-6
+                  input#exampleRepeatPassword.form-control.form-control-user(type='password', placeholder='Nhập lại mật khẩu' name="repeatpassword")
+              button.btn.btn-primary.btn-user.btn-block(href='#' style='text-align: center;')
+                | chỉnh sửa

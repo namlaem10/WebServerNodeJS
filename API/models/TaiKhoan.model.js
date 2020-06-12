@@ -28,7 +28,7 @@ var userSchema = new mongoose.Schema({
   phone: String,
   status: Number,
   avatar: String,
-  role: String,
+  role: Number,
   create_at: Date,
   update_at: Date,
 });

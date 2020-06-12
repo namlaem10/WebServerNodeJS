@@ -26,26 +26,24 @@ html
                 .col-lg-6
                   .p-5
                     .text-center
-                      h1.h4.text-gray-900.mb-4 Welcome Back!
+                      h1.h4.text-gray-900.mb-4 Quản lý Travel Sharing
                     if error
                       .text-center
                       p(style="color:red;")= error
                     form.user( action="/login" method="POST")
                       .form-group
-                        input#exampleInputEmail.form-control.form-control-user(name="email" type='email', aria-describedby='emailHelp', placeholder='Nhập tài khoản' required)
+                        input#exampleInputEmail.form-control.form-control-user(name="email" type='email', aria-describedby='emailHelp', placeholder='Địa chỉ email' required)
                       .form-group
-                        input#exampleInputPassword.form-control.form-control-user(name="password" type='password', placeholder='Password' required)
+                        input#exampleInputPassword.form-control.form-control-user(name="password" type='password', placeholder='Mật khẩu' required)
                       .form-group
                       .custom-control.custom-checkbox.small
                         input#customCheck.custom-control-input(type='checkbox' name="checkbox")
-                        label.custom-control-label(for='customCheck') Remember Me
+                        label.custom-control-label(for='customCheck') Ghi nhớ tôi
                       button.btn.btn-primary.btn-user.btn-block(href='#' style='text-align: center;')
-                        | Login 
+                        | Đăng nhập 
                     hr
                     .text-center
-                      a.small(href='/') Forgot Password?
-                    .text-center
-                      a.small(href='/') Create an Account!
+                      a.small(href='/') Quên mật khẩu?
 
     // Bootstrap core JavaScript
     script(src='/vendor/jquery/jquery.min.js')

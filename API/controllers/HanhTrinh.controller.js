@@ -36,8 +36,8 @@ module.exports.saleman = async (req, res) => {
     console.log(min_distance);
     return min_distance.indexOf(Math.min(...min_distance));
   };
+  const new_schedule_detail = {};
   for (const key in schedule_detail) {
-    console.log(schedule_detail[key]);
     if (schedule_detail[key].length > 0) {
       const place_start = schedule_detail[key][0];
       schedule_detail[key].shift();
@@ -52,7 +52,7 @@ module.exports.saleman = async (req, res) => {
         distance_sort.push(schedule_detail[key][temp]);
         temp_array = schedule_detail[key].splice(temp, 1);
       }
-      console.log("distance_sort: ", distance_sort);
+      new_schedule_detail[`${key}`] = distance_sort;
     }
   }
   res.json(new_schedule_detail);

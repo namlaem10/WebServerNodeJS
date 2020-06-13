@@ -308,7 +308,6 @@ module.exports.own = (req, res) => {
       }
     });
 };
-
 module.exports.create = async (req, res) => {
   const id = req.user.idUser;
   const destination = await Destination.findOne(
@@ -330,34 +329,28 @@ module.exports.create = async (req, res) => {
       number_of_days: Object.keys(req.body.schedule_detail).length,
       schedule_detail: req.body.schedule_detail,
       status: "created",
-      copy_reference:
-        req.body.copy_reference === "null" ? null : req.body.copy_reference,
+      copy_reference: !req.body.copy_reference ? null : req.body.copy_reference,
       copy_list: [],
       create_at: new Date().toLocaleString(),
       update_at: null,
     });
-    schedule.save(async (err, newSchedule) => {
+    schedule.save(async (err) => {
       if (err) res.status(400).send(err);
       if (req.body.schedule_reference) {
-        Schedule.findById(
-          req.body.schedule_reference,
-          (err, schedule_reference) => {
-            if (err) res.status(400).send(err);
-            const copy_list_new = [
-              ...schedule_reference.copy_list,
-              newSchedule._id,
-            ];
-            console.log(copy_list_new);
-            Schedule.updateOne(
-              { _id: schedule_reference._id },
-              { copy_list: copy_list_new },
-              (err, Schedule_reference) => {
-                if (err) res.status(400).send(err);
-                console.log(Schedule_reference);
-              }
-            );
-          }
-        );
+        const schedule_reference_find = await Schedule.findOne({
+          _id: req.body.schedule_reference,
+        });
+        if (
+          JSON.stringify(schedule.schedule_detail) ===
+          JSON.stringify(schedule_reference_find.schedule_detail)
+        ) {
+          // Trùng nhau => có copy
+          schedule_reference_find.copy_list = [
+            ...schedule_reference_find.copy_list,
+            schedule._id,
+          ];
+          await schedule_reference_find.save();
+        }
       }
       const all_travel = await Travel.find();
       const lastest_id = all_travel.reverse();

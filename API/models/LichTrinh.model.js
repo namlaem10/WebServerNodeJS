@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./TaiKhoan.model");
-
+const Travel = require("./HanhTrinh.model");
 var scheduleSchema = new mongoose.Schema({
   _id: {
     type: String,
@@ -24,7 +24,7 @@ var scheduleSchema = new mongoose.Schema({
   },
   copy_reference: {
     type: String,
-    ref: "User",
+    ref: "Travel",
   },
   copy_list: [{ type: String, ref: "TouristDesination" }],
   status: String,

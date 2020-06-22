@@ -1,0 +1,56 @@
+extends ../layouts/common
+block script
+  // Page level plugins
+  script(src='/vendor/datatables/jquery.dataTables.min.js')
+  script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
+  // Page level custom scripts
+  script(src='/js/togged-modal.js')
+block css
+  // Custom styles for this page
+  link(href='/vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
+  link(href='/css/timeline.css', rel='stylesheet')
+block content
+  .container-fluid
+    //Modal page
+    .d-sm-flex.align-items-center.justify-content-between.mb-4
+      a.h3.mb-0.text-800(href="/tour" style="color:'#B5D5FF';")= "←   Chi tiết hành trình " + travel._id 
+    .card-body.p-0
+      - var n = 1;
+      ul.pagination
+        while n <= nod
+          if n===day
+            li.page-item.active
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+          else
+            li.page-item
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+      // Nested Row within Card Body
+      .timeline
+        each val, index in schedule
+          if index%2===0
+            .infobox.left
+              .infobox-content
+                h5(color="#34D374")= val.tourist_destination_name
+                p= val.tourist_destination_address
+                img(src=val.tourist_destination_image alt=val.tourist_destination_name width="180" height="100")
+          else
+            .infobox.right
+              .infobox-content
+                h5(color="#34D374")= val.tourist_destination_name
+                p= val.tourist_destination_address
+                img(src=val.tourist_destination_image alt=val.tourist_destination_name width="180" height="100")
+      br
+      br
+      - var n = 1;
+      ul.pagination
+        while n <= nod
+          if n===day
+            li.page-item.active
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+          else
+            li.page-item
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+        //- .infobox.right
+        //-   .infobox-content
+        //-     h4 2016
+        //-     p Lorem ipsum..

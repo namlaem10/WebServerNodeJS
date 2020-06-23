@@ -8,7 +8,7 @@ block script
   script(src='/js/togged-modal.js')
 block css
   // Custom styles for this page
-  link(href='vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
+  link(href='/vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
 block content
   .container-fluid
     //Modal page
@@ -37,8 +37,8 @@ block content
     // Page Heading
     .d-sm-flex.align-items-center.justify-content-between.mb-4
       h1.h3.mb-0.text-gray-800 Quản lý hành trình
-    //-   a.d-none.d-sm-inline-block.btn.btn-sm.btn-primary.shadow-sm(href='/user/create')
-    //-     |  Thêm tài khoản
+      a.d-none.d-sm-inline-block.btn.btn-sm.btn-danger.shadow-sm(href='/tour/report')= "Danh sách báo cáo ( " + report +" mới ) "
+
     // DataTales Example
     .card.shadow.mb-4
       .card-header.py-3
@@ -82,9 +82,9 @@ block content
                     br
                     if !val.is_hidden
                       if val.isShare
-                        a(href='#', data-href="/tour/block/"+val._id, data-toggle='modal', data-target='#confirm-block' style="color:red;") Ẩn
+                        a(href='#', data-href="/tour/travel/block/"+val._id, data-toggle='modal', data-target='#confirm-block' style="color:red;") Ẩn
                       else 
                         a(href='#' style="color:black;") Chưa chia sẻ
                     else
-                      a(href='#', data-href="/tour/unblock/"+val._id, data-toggle='modal', data-target='#confirm-unblock' style="color:gray;") Đã Ẩn
+                      a(href='#', data-href="/tour/travel/unblock/"+val._id, data-toggle='modal', data-target='#confirm-unblock' style="color:gray;") Đã Ẩn
                 // /.container-fluid

@@ -5,33 +5,34 @@ block script
   script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
   // Page level custom scripts
   script(src='/js/demo/datatables-demo.js')
+  script(src='/js/togged-modal.js')
 block css
   // Custom styles for this page
   link(href='vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
 block content
   .container-fluid
-    //- //Modal page
-    //- #confirm-unblock.modal.fade(tabindex='-1', role='dialog', aria-labelledby='unBlockModal', aria-hidden='true')
-    //-   .modal-dialog
-    //-     .modal-content
-    //-       .modal-header
-    //-         | Mở khóa tài khoản
-    //-       .modal-body
-    //-         | Bạn có chắc muốn mở khóa tài khoản này?
-    //-       .modal-footer
-    //-         button.btn.btn-default(type='button', data-dismiss='modal') Hủy
-    //-         a.btn.btn-success.btn-ok(style="color:white;") Mở khóa
+    //Modal page
+    #confirm-unblock.modal.fade(tabindex='-1', role='dialog', aria-labelledby='unBlockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | mở khóa bài viết
+          .modal-body
+            | Bạn có chắc muốn mở khóa bài viết này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Hủy
+            a.btn.btn-success.btn-ok(style="color:white;") Mở khóa
 
-    //- #confirm-block.modal.fade(tabindex='-1', role='dialog', aria-labelledby='BlockModal', aria-hidden='true')
-    //-   .modal-dialog
-    //-     .modal-content
-    //-       .modal-header
-    //-         | Khóa tài khoản
-    //-       .modal-body
-    //-         | Bạn có chắc muốn khóa tài khoản này?
-    //-       .modal-footer
-    //-         button.btn.btn-default(type='button', data-dismiss='modal') Hủy
-    //-         a.btn.btn-danger.btn-ok(style="color:white;") Khóa
+    #confirm-block.modal.fade(tabindex='-1', role='dialog', aria-labelledby='BlockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | Khóa bài viết
+          .modal-body
+            | Bạn có chắc muốn Khóa bài viết này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Hủy
+            a.btn.btn-danger.btn-ok(style="color:white;") Khóa
 
     // Page Heading
     .d-sm-flex.align-items-center.justify-content-between.mb-4
@@ -48,35 +49,42 @@ block content
             thead
               tr
                 th Id
-                th Điểm đi
-                th Điểm dến
+                th Đi - Đến
                 th Thời gian
                 th Tạo bởi
                 th Ngày tạo
+                th Ngày chia sẻ
                 th Ngày cập nhật
                 th
             tfoot
               tr
                 th Id
-                th Điểm đi
-                th Điểm dến
+                th Đi - Đến
                 th Thời gian
                 th Tạo bởi
                 th Ngày tạo
+                th Ngày chia sẻ
                 th Ngày cập nhật
                 th 
             tbody
-              //- each val in listHT
+              each val in listHT
                 tr
-                //-   td= val.display_name
-                //-   td= val.email
-                //-   td= val.phone
-                //-   td= moment(val.create_at).format('DD/MM/YYYY')
-                //-   td= val.update_at? moment(val.update_at).format('DD/MM/YYYY') : null
-                //-   td
-                //-     a(href="/user/"+val._id) Sửa &nbsp; &nbsp;
-                //-     if val.status===1
-                //-       a(href='#', data-href="/user/block/"+val._id, data-toggle='modal', data-target='#confirm-block' style="color:red;") khóa
-                //-     else
-                //-       a(href='#', data-href="/user/unblock/"+val._id, data-toggle='modal', data-target='#confirm-unblock' style="color:gray;") Đã khóa
+                  td= val._id
+                  td= val.departure + "-" + val.destination
+                  td= moment(val.start_day).format('DD/MM/YYYY') + "-" + moment(val.end_day).format('DD/MM/YYYY')
+                  td= val.create_by.display_name
+                  td= moment(val.create_at).format('DD/MM/YYYY')
+                  td= val.share_at? moment(val.share_at).format('DD/MM/YYYY') : null
+                  td
+                    img(src=val.background alt=val.title width="180" height="100")
+                  td
+                    a(href="/tour/"+val._id+"/day_1") Chi tiết &nbsp;
+                    br
+                    if !val.is_hidden
+                      if val.isShare
+                        a(href='#', data-href="/tour/block/"+val._id, data-toggle='modal', data-target='#confirm-block' style="color:red;") Ẩn
+                      else 
+                        a(href='#' style="color:black;") Chưa chia sẻ
+                    else
+                      a(href='#', data-href="/tour/unblock/"+val._id, data-toggle='modal', data-target='#confirm-unblock' style="color:gray;") Đã Ẩn
                 // /.container-fluid

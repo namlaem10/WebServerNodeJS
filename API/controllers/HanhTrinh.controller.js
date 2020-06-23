@@ -365,7 +365,6 @@ module.exports.create = async (req, res) => {
     let endDate = new Date(req.body.end_day);
     let startDate = new Date(req.body.start_day);
     let number_of_days = new Date(endDate - startDate).getDate();
-    console.log(number_of_days);
     const schedule = new Schedule({
       _id: new_id < 10 ? `LT0${new_id}` : `LT${new_id}`,
       destination: req.body.destination,

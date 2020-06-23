@@ -3,6 +3,7 @@ const fs = require("fs");
 const md5 = require("md5");
 const User = require("../API/models/TaiKhoan.model");
 const Travel = require("../API/models/HanhTrinh.model");
+const Report = require("../API/models/BaoCao.model");
 // var nodemailer = require("nodemailer");
 const accessTokenSecret = "dangcongsanvietnammuonnam";
 // fake data:
@@ -11,6 +12,7 @@ module.exports.index = async (req, res) => {
   let userId = req.signedCookies.sessionId;
   try {
     const user = await User.findOne({ _id: userId, status: 1, role: 1 });
+    const report = await Report.find({ isSolve: false });
     const listHt = await Travel.find({}).populate(
       "create_by",
       "-friend -password -fcmToken"
@@ -22,34 +24,85 @@ module.exports.index = async (req, res) => {
       title: "Quản lý Hành trình",
       listHT: listHt,
       user: user,
+      report: report.length,
     });
   } catch (error) {
     console.log(error);
   }
 };
-
+module.exports.report = async (req, res) => {
+  let userId = req.signedCookies.sessionId;
+  try {
+    const user = await User.findOne({ _id: userId, status: 1, role: 1 });
+    const listRp = await Report.find({}).populate(
+      "reporter",
+      "-friend -password -fcmToken"
+    );
+    res.render("./Tour/report", {
+      title: "Danh sách báo cáo",
+      listRp: listRp,
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+module.exports.solve = async (req, res) => {
+  try {
+    const report = await Report.findByIdAndUpdate(
+      { _id: req.params.id },
+      { isSolve: true }
+    );
+    res.redirect("/tour/report");
+  } catch (error) {
+    console.log(error);
+    res.redirect("/tour/report");
+  }
+};
 module.exports.block = async (req, res) => {
+  var location = req.url;
+  let type = location.split("/");
+  let newUrl = `/tour/${type[3]}/day_1`;
   try {
     const travel = await Travel.findByIdAndUpdate(
       { _id: req.params.id },
       { is_hidden: true }
     );
-    res.redirect("/tour");
+    if (type[1] !== "travel") {
+      res.redirect(newUrl);
+    } else {
+      res.redirect("/tour");
+    }
   } catch (error) {
     console.log(error);
-    res.redirect("/tour");
+    if (type[1] !== "travel") {
+      res.redirect(newUrl);
+    } else {
+      res.redirect("/tour");
+    }
   }
 };
 module.exports.unBlock = async (req, res) => {
+  var location = req.url;
+  let type = location.split("/");
+  let newUrl = `/tour/${type[3]}/day_1`;
   try {
     const travel = await Travel.findByIdAndUpdate(
       { _id: req.params.id },
       { is_hidden: false }
     );
-    res.redirect("/tour");
+    if (type[1] !== "travel") {
+      res.redirect(newUrl);
+    } else {
+      res.redirect("/tour");
+    }
   } catch (error) {
     console.log(error);
-    res.redirect("/tour");
+    if (type[1] !== "travel") {
+      res.redirect(newUrl);
+    } else {
+      res.redirect("/tour");
+    }
   }
 };
 
@@ -58,17 +111,7 @@ module.exports.travelDetail = async (req, res) => {
   try {
     const user = await User.findOne({ _id: userId, status: 1, role: 1 });
     const travel = await Travel.findOne({ _id: req.params.id })
-      .populate({
-        path: "schedule",
-        populate: {
-          path: "copy_reference",
-          select: "create_by schedule",
-          populate: {
-            path: "create_by",
-            select: "display_name",
-          },
-        },
-      })
+      .populate("create_by", "display_name")
       .populate({
         path: "schedule",
         populate: {

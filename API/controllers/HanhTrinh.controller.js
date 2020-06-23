@@ -4,6 +4,7 @@ const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
 const Destination = require("../models/DiaDiem.model");
+const Report = require("../models/BaoCao.model");
 
 module.exports.saleman = async (req, res) => {
   const schedule = await Schedule.findOne(
@@ -825,6 +826,29 @@ module.exports.rating = async (req, res) => {
           );
         }
       );
+    }
+  });
+};
+
+module.exports.report = async (req, res) => {
+  const userID = req.user.idUser;
+  const all_report = await Report.find();
+  const lastest_id = all_report.reverse();
+  const new_id =
+    all_report.length === 0 ? 1 : parseInt(lastest_id[0]._id.split("P")[1]) + 1;
+  const report = new Report({
+    _id: new_id < 10 ? `RP0${new_id}` : `RP${new_id}`,
+    travel: req.body.travel,
+    reporter: userID,
+    reason: req.body.reason,
+    create_at: new Date(),
+    solve_at: null,
+    isSolve: false,
+  });
+  report.save((err) => {
+    if (err) res.status(400).send(err);
+    else {
+      res.status(200).json({ message: "success" });
     }
   });
 };

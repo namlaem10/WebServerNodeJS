@@ -4,6 +4,7 @@ const Travel = require("../models/HanhTrinh.model");
 const Schedule = require("../models/LichTrinh.model");
 const User = require("../models/TaiKhoan.model");
 const Destination = require("../models/DiaDiem.model");
+const Report = require("../models/BaoCao.model");
 
 module.exports.saleman = async (req, res) => {
   const schedule = await Schedule.findOne(
@@ -36,8 +37,8 @@ module.exports.saleman = async (req, res) => {
     console.log(min_distance);
     return min_distance.indexOf(Math.min(...min_distance));
   };
+  const new_schedule_detail = {};
   for (const key in schedule_detail) {
-    console.log(schedule_detail[key]);
     if (schedule_detail[key].length > 0) {
       const place_start = schedule_detail[key][0];
       schedule_detail[key].shift();
@@ -52,7 +53,7 @@ module.exports.saleman = async (req, res) => {
         distance_sort.push(schedule_detail[key][temp]);
         temp_array = schedule_detail[key].splice(temp, 1);
       }
-      console.log("distance_sort: ", distance_sort);
+      new_schedule_detail[`${key}`] = distance_sort;
     }
   }
   res.json(new_schedule_detail);
@@ -64,6 +65,17 @@ module.exports.get = (req, res) => {
     .populate("create_by", "-friend -password -fcmToken")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "copy_reference",
+        select: "create_by schedule",
+        populate: {
+          path: "create_by",
+          select: "display_name",
+        },
+      },
+    })
     .populate({
       path: "schedule",
       populate: {
@@ -128,6 +140,17 @@ module.exports.all = (req, res) => {
     .populate("create_by", "-friend -password -fcmToken")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "copy_reference",
+        select: "create_by schedule",
+        populate: {
+          path: "create_by",
+          select: "display_name",
+        },
+      },
+    })
     .populate({
       path: "schedule",
       populate: {
@@ -211,7 +234,13 @@ module.exports.all = (req, res) => {
     .exec((err, travel) => {
       if (err) res.status(400).send(err);
       else {
-        res.status(200).json(travel);
+        let hottravels = travel.filter(
+          (item) => item.schedule.copy_list.length > 0
+        );
+        hottravels.sort(function (a, b) {
+          return b.schedule.copy_list.length - a.schedule.copy_list.length;
+        });
+        res.status(200).json({ all: travel, hot: hottravels });
       }
     });
 };
@@ -222,6 +251,17 @@ module.exports.own = (req, res) => {
     .populate("create_by", "-friend -password -fcmToken")
     .populate("destination", "-_id")
     .populate("departure", "-_id")
+    .populate({
+      path: "schedule",
+      populate: {
+        path: "copy_reference",
+        select: "create_by schedule",
+        populate: {
+          path: "create_by",
+          select: "display_name",
+        },
+      },
+    })
     .populate({
       path: "schedule",
       populate: {
@@ -308,7 +348,6 @@ module.exports.own = (req, res) => {
       }
     });
 };
-
 module.exports.create = async (req, res) => {
   const id = req.user.idUser;
   const destination = await Destination.findOne(
@@ -324,17 +363,44 @@ module.exports.create = async (req, res) => {
       all_schedule.length === 0
         ? 1
         : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
+    let endDate = new Date(req.body.end_day);
+    let startDate = new Date(req.body.start_day);
+    let number_of_days = new Date(endDate - startDate).getDate();
     const schedule = new Schedule({
       _id: new_id < 10 ? `LT0${new_id}` : `LT${new_id}`,
       destination: req.body.destination,
-      number_of_days: Object.keys(req.body.schedule_detail).length,
+      number_of_days: number_of_days,
       schedule_detail: req.body.schedule_detail,
       status: "created",
+      copy_reference: null,
+      copy_list: [],
       create_at: new Date().toLocaleString(),
       update_at: null,
     });
     schedule.save(async (err) => {
       if (err) res.status(400).send(err);
+      if (req.body.schedule_reference) {
+        const schedule_reference_find = await Schedule.findOne({
+          _id: req.body.schedule_reference,
+        });
+        if (
+          JSON.stringify(schedule.schedule_detail) ===
+          JSON.stringify(schedule_reference_find.schedule_detail)
+        ) {
+          // Trùng nhau => có copy
+          schedule_reference_find.copy_list = [
+            ...schedule_reference_find.copy_list,
+            schedule._id,
+          ];
+          try {
+            await schedule_reference_find.save();
+            schedule.copy_reference = req.body.copy_reference;
+            await schedule.save();
+          } catch (err) {
+            res.status(400).send(err);
+          }
+        }
+      }
       const all_travel = await Travel.find();
       const lastest_id = all_travel.reverse();
       const new_id =
@@ -358,15 +424,28 @@ module.exports.create = async (req, res) => {
         update_at: null,
         isShare: false,
         create_by: id,
+        is_hidden: false,
         background: destination.toJSON().destination_image,
         share_at: null,
       });
+      console.log(schedule, travel);
       travel.save((err) => {
         if (err) res.status(400).send(err);
         Travel.find({ _id: travel._id })
           .populate("create_by", "-friend -password -fcmToken")
           .populate("destination", "-_id")
           .populate("departure", "-_id")
+          .populate({
+            path: "schedule",
+            populate: {
+              path: "copy_reference",
+              select: "create_by schedule",
+              populate: {
+                path: "create_by",
+                select: "display_name",
+              },
+            },
+          })
           .populate({
             path: "schedule",
             populate: {
@@ -501,6 +580,17 @@ module.exports.update = (req, res) => {
           .populate({
             path: "schedule",
             populate: {
+              path: "copy_reference",
+              select: "create_by schedule",
+              populate: {
+                path: "create_by",
+                select: "display_name",
+              },
+            },
+          })
+          .populate({
+            path: "schedule",
+            populate: {
               path: "schedule_detail.day_1",
               select: "-destination",
             },
@@ -593,7 +683,19 @@ module.exports.blog = (req, res) => {
         .populate({
           path: "schedule",
           populate: {
+            path: "copy_reference",
+            select: "create_by schedule",
+            populate: {
+              path: "create_by",
+              select: "display_name",
+            },
+          },
+        })
+        .populate({
+          path: "schedule",
+          populate: {
             path: "schedule_detail.day_1",
+
             select: "-destination",
           },
         })
@@ -724,6 +826,29 @@ module.exports.rating = async (req, res) => {
           );
         }
       );
+    }
+  });
+};
+
+module.exports.report = async (req, res) => {
+  const userID = req.user.idUser;
+  const all_report = await Report.find();
+  const lastest_id = all_report.reverse();
+  const new_id =
+    all_report.length === 0 ? 1 : parseInt(lastest_id[0]._id.split("P")[1]) + 1;
+  const report = new Report({
+    _id: new_id < 10 ? `RP0${new_id}` : `RP${new_id}`,
+    travel: req.body.travel,
+    reporter: userID,
+    reason: req.body.reason,
+    create_at: new Date(),
+    solve_at: null,
+    isSolve: false,
+  });
+  report.save((err) => {
+    if (err) res.status(400).send(err);
+    else {
+      res.status(200).json({ message: "success" });
     }
   });
 };

@@ -1,0 +1,73 @@
+extends ../layouts/common
+block script
+  // Page level plugins
+  script(src='/vendor/datatables/jquery.dataTables.min.js')
+  script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
+  // Page level custom scripts
+  script(src='/js/demo/datatables-demo.js')
+  script(src='/js/togged-modal.js')
+block css
+  // Custom styles for this page
+  link(href='/vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
+block content
+  .container-fluid
+    //Modal page
+    #confirm-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='blockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | Xác nhận
+          .modal-body
+            | Bạn xác nhận đã xử lý bài viết này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Quay lại
+            a.btn.btn-success.btn-ok(style="color:white;") Xác nhận
+
+    // Page Heading
+    .d-sm-flex.align-items-center.justify-content-between.mb-4
+      a.h3.mb-0.text-800(href="/tour" style="color:'#B5D5FF';") Về trang trước
+    //-   a.d-none.d-sm-inline-block.btn.btn-sm.btn-primary.shadow-sm(href='/user/create')
+    //-     |  Thêm tài khoản
+    // DataTales Example
+    .card.shadow.mb-4
+      .card-header.py-3
+        h6.m-0.font-weight-bold.text-primary Danh sách báo cáo
+      .card-body
+        .table-responsive
+          table#dataTable.table.table-bordered(width='100%', cellspacing='0')
+            thead
+              tr
+                th Tình trạng
+                th Hành trình
+                th Người báo cáo
+                th Nội dung
+                th Ngày tạo
+                th Ngày xử lý
+                th
+            tfoot
+              tr
+                th Tình trạng
+                th Hành trình
+                th Người báo cáo
+                th Nội dung
+                th Ngày tạo
+                th Ngày xử lý
+                th 
+            tbody
+              each val in listRp
+                tr
+                  td= val.isSolve? "Đã xử lý" : "Chưa xử lý"
+                  td= val.travel
+                  td= val.reporter.display_name
+                  td= val.reason
+                  td= moment(val.create_at).format('DD/MM/YYYY')
+                  td= val.solve_at? moment(val.solve_at).format('DD/MM/YYYY') : null
+                  td
+                    if !val.isSolve
+                      a(href="/tour/"+val.travel+"/day_1") Chi tiết &nbsp;
+                    br
+                    if !val.isSolve
+                      a(href='#', data-href="/tour/report/solve/"+val._id, data-toggle='modal', data-target='#confirm-modal' style="color:red;") Xử lý
+                    else
+                      p(style="color:green;") Đã xử lý
+                // /.container-fluid

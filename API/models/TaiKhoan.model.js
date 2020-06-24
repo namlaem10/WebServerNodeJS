@@ -26,7 +26,9 @@ var userSchema = new mongoose.Schema({
   fcmToken: String,
   friend: [{ type: String, ref: "User" }],
   phone: String,
+  status: Number,
   avatar: String,
+  role: Number,
   create_at: Date,
   update_at: Date,
 });

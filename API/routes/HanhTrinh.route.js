@@ -19,6 +19,7 @@ const {
   rating,
   get,
   saleman,
+  report,
 } = controller;
 
 const route = express.Router();
@@ -39,6 +40,7 @@ route.put("/comment/:id", authenticationMiddleware, comment);
 route.put("/rating/:id", authenticationMiddleware, rating);
 
 route.delete("/remove/:id", authenticationMiddleware, remove);
+route.post("/report", authenticationMiddleware, report);
 
 route.put(
   "/blog/:id",

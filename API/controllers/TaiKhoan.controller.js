@@ -24,7 +24,6 @@ module.exports.addfriend = (req, res) => {
     );
   });
 };
-
 module.exports.find = async (req, res) => {
   const { search } = req.query;
   const id = req.user.idUser;
@@ -109,7 +108,45 @@ module.exports.login = async (req, res) => {
     });
   }
 };
-
+module.exports.getinfo = async (req, res) => {
+  const id = req.user.idUser;
+  User.findOne({ _id: id }, "-password -fcmToken")
+    .populate("friend", "email display_name avatar phone")
+    .exec(async (err, user_return) => {
+      if (err) res.status(400).send(err);
+      else {
+        const travel = await Travel.find({ create_by: id });
+        const total_travel = await Travel.countDocuments({
+          member: id,
+        });
+        const travel_share = travel.filter((item) => {
+          return item.isShare === true;
+        });
+        const travel_have_rating = travel_share.filter((item) => {
+          return item.rating_count !== 0;
+        }).length;
+        let total_rating = 0;
+        let person_rating = 0;
+        travel_share.map((item) => {
+          if (item.rating_count !== 0)
+            return (
+              (total_rating += item.rating),
+              (person_rating += item.rating_count)
+            );
+        });
+        res.json({
+          user_info: user_return,
+          total_travel: total_travel,
+          travel_share: travel_share.length,
+          rating_point:
+            travel_share.length === 0
+              ? 0
+              : Math.round(total_rating / travel_have_rating),
+          people_rating: person_rating,
+        });
+      }
+    });
+};
 module.exports.register = async (req, res) => {
   const { email, password, display_name, phone } = req.body;
   if (
@@ -140,6 +177,8 @@ module.exports.register = async (req, res) => {
         friend: [],
         create_at: new Date().toLocaleString(),
         update_at: null,
+        role: 0,
+        status: 1,
         avatar: `https://res.cloudinary.com/namlaem/image/upload/v1591552158/Travel%20Sharing/avatar_ad9mib.png`,
         phone: phone,
         fcmToken: null,

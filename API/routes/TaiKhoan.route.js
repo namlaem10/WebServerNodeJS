@@ -16,6 +16,7 @@ const {
   find,
   addfriend,
   forgotpassword,
+  getinfo,
 } = controller;
 
 const route = express.Router();
@@ -43,5 +44,7 @@ route.post("/forgotpassword", forgotpassword);
 route.post("/find", authenticationMiddleware, find);
 
 route.put("/addfriend", authenticationMiddleware, addfriend);
+
+route.get("/getinfo", authenticationMiddleware, getinfo);
 
 module.exports = route;

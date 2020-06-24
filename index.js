@@ -18,7 +18,7 @@ const app = express();
 const port = 3000;
 
 // Connection MongoDB
-mongoose.connect("mongodb://localhost/TravelSharing", {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
@@ -67,5 +67,5 @@ app.get("/logout", auth, logout);
 app.use("/user", auth, webUserRoute);
 app.use("/tour", auth, webHanhTrinhRoute);
 app.listen(process.env.PORT || port, () => {
-  console.log("Server is running...");
+  console.log("Server is running..." + process.env.PORT + "or" + port);
 });

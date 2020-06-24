@@ -105,9 +105,13 @@ module.exports.send = async (req, res) => {
       return item != null;
     });
     const all_noti = await Notification.find();
-    const lastest_id = all_noti.reverse();
+    all_noti.sort(function (a, b) {
+      let numa = parseInt(a._id.substring(2, a.id.length));
+      let numb = parseInt(b._id.substring(2, b.id.length));
+      return numb - numa;
+    });
     const new_id =
-      all_noti.length === 0 ? 1 : parseInt(lastest_id[0]._id.split("B")[1]) + 1;
+      all_noti.length === 0 ? 1 : parseInt(all_noti[0]._id.split("B")[1]) + 1;
     const noti = new Notification({
       _id: new_id < 10 ? `TB0${new_id}` : `TB${new_id}`,
       travel: id,

@@ -34,7 +34,6 @@ module.exports.saleman = async (req, res) => {
       })
     );
     const min_distance = await array_distance;
-    console.log(min_distance);
     return min_distance.indexOf(Math.min(...min_distance));
   };
   const new_schedule_detail = {};
@@ -357,12 +356,16 @@ module.exports.create = async (req, res) => {
   const member = req.body.member ? req.body.member : [];
   member.unshift(id);
   if (req.body) {
-    const all_schedule = await Schedule.find();
-    const lastest_id = all_schedule.reverse();
+    const all_schedule = await Schedule.find({}, "_id");
+    all_schedule.sort(function (a, b) {
+      let numa = parseInt(a._id.substring(2, a.id.length));
+      let numb = parseInt(b._id.substring(2, b.id.length));
+      return numb - numa;
+    });
     const new_id =
       all_schedule.length === 0
         ? 1
-        : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
+        : parseInt(all_schedule[0]._id.split("T")[1]) + 1;
     let endDate = new Date(req.body.end_day);
     let startDate = new Date(req.body.start_day);
     let number_of_days = new Date(endDate - startDate).getDate();
@@ -402,11 +405,15 @@ module.exports.create = async (req, res) => {
         }
       }
       const all_travel = await Travel.find();
-      const lastest_id = all_travel.reverse();
+      all_travel.sort(function (a, b) {
+        let numa = parseInt(a._id.substring(2, a.id.length));
+        let numb = parseInt(b._id.substring(2, b.id.length));
+        return numb - numa;
+      });
       const new_id =
         all_travel.length === 0
           ? 1
-          : parseInt(lastest_id[0]._id.split("T")[1]) + 1;
+          : parseInt(all_travel[0]._id.split("T")[1]) + 1;
       const travel = new Travel({
         _id: new_id < 10 ? `HT0${new_id}` : `HT${new_id}`,
         departure: req.body.departure,
@@ -428,7 +435,6 @@ module.exports.create = async (req, res) => {
         background: destination.toJSON().destination_image,
         share_at: null,
       });
-      console.log(schedule, travel);
       travel.save((err) => {
         if (err) res.status(400).send(err);
         Travel.find({ _id: travel._id })
@@ -833,9 +839,13 @@ module.exports.rating = async (req, res) => {
 module.exports.report = async (req, res) => {
   const userID = req.user.idUser;
   const all_report = await Report.find();
-  const lastest_id = all_report.reverse();
+  all_report.sort(function (a, b) {
+    let numa = parseInt(a._id.substring(2, a.id.length));
+    let numb = parseInt(b._id.substring(2, b.id.length));
+    return numb - numa;
+  });
   const new_id =
-    all_report.length === 0 ? 1 : parseInt(lastest_id[0]._id.split("P")[1]) + 1;
+    all_report.length === 0 ? 1 : parseInt(all_report[0]._id.split("P")[1]) + 1;
   const report = new Report({
     _id: new_id < 10 ? `RP0${new_id}` : `RP${new_id}`,
     travel: req.body.travel,

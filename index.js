@@ -16,14 +16,18 @@ const webUserRoute = require("./routes/TaiKhoan.route");
 const webHanhTrinhRoute = require("./routes/HanhTrinh.route");
 const app = express();
 const port = 3000;
-
 // Connection MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-});
+mongoose.connect(
+  // "mongodb://heroku_f97q12gr:qhltvabm1opvn01glqi95led75@ds031847.mlab.com:31847/heroku_f97q12gr" ||
+  //   process.env.MONGO_URI,
+  process.env.MONGO_URI,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  }
+);
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {

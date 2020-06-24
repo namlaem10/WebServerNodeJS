@@ -165,8 +165,8 @@ module.exports.register = async (req, res) => {
     } else {
       const all_user = await User.find();
       all_user.sort(function (a, b) {
-        let numa = parseInt(a._id.substring(2, a.id.length));
-        let numb = parseInt(b._id.substring(2, b.id.length));
+        let numa = parseInt(a._id.substring(2, a._id.length));
+        let numb = parseInt(b._id.substring(2, b._id.length));
         return numb - numa;
       });
       const new_id =

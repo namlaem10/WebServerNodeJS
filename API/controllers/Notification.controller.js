@@ -106,8 +106,8 @@ module.exports.send = async (req, res) => {
     });
     const all_noti = await Notification.find();
     all_noti.sort(function (a, b) {
-      let numa = parseInt(a._id.substring(2, a.id.length));
-      let numb = parseInt(b._id.substring(2, b.id.length));
+      let numa = parseInt(a._id.substring(2, a._id.length));
+      let numb = parseInt(b._id.substring(2, b._id.length));
       return numb - numa;
     });
     const new_id =

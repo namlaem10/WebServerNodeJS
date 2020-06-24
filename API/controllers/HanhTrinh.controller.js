@@ -358,8 +358,8 @@ module.exports.create = async (req, res) => {
   if (req.body) {
     const all_schedule = await Schedule.find({}, "_id");
     all_schedule.sort(function (a, b) {
-      let numa = parseInt(a._id.substring(2, a.id.length));
-      let numb = parseInt(b._id.substring(2, b.id.length));
+      let numa = parseInt(a._id.substring(2, a._id.length));
+      let numb = parseInt(b._id.substring(2, b._id.length));
       return numb - numa;
     });
     const new_id =
@@ -406,8 +406,8 @@ module.exports.create = async (req, res) => {
       }
       const all_travel = await Travel.find();
       all_travel.sort(function (a, b) {
-        let numa = parseInt(a._id.substring(2, a.id.length));
-        let numb = parseInt(b._id.substring(2, b.id.length));
+        let numa = parseInt(a._id.substring(2, a._id.length));
+        let numb = parseInt(b._id.substring(2, b._id.length));
         return numb - numa;
       });
       const new_id =
@@ -840,8 +840,8 @@ module.exports.report = async (req, res) => {
   const userID = req.user.idUser;
   const all_report = await Report.find();
   all_report.sort(function (a, b) {
-    let numa = parseInt(a._id.substring(2, a.id.length));
-    let numb = parseInt(b._id.substring(2, b.id.length));
+    let numa = parseInt(a._id.substring(2, a._id.length));
+    let numb = parseInt(b._id.substring(2, b._id.length));
     return numb - numa;
   });
   const new_id =

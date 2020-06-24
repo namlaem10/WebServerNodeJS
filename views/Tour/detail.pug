@@ -1,0 +1,122 @@
+extends ../layouts/common
+block script
+  // Page level plugins
+  script(src='/vendor/datatables/jquery.dataTables.min.js')
+  script(src='/vendor/datatables/dataTables.bootstrap4.min.js')
+  // Page level custom scripts
+  script(src='/js/togged-modal.js')
+block css
+  // Custom styles for this page
+  link(href='/vendor/datatables/dataTables.bootstrap4.min.css', rel='stylesheet')
+  link(href='/css/timeline.css', rel='stylesheet')
+block content
+  .container-fluid
+    //Modal page
+    #confirm-unblock.modal.fade(tabindex='-1', role='dialog', aria-labelledby='unBlockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | mở khóa bài viết
+          .modal-body
+            | Bạn có chắc muốn mở khóa bài viết này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Hủy
+            a.btn.btn-success.btn-ok(style="color:white;") Mở khóa
+
+    #confirm-block.modal.fade(tabindex='-1', role='dialog', aria-labelledby='BlockModal', aria-hidden='true')
+      .modal-dialog
+        .modal-content
+          .modal-header
+            | Khóa bài viết
+          .modal-body
+            | Bạn có chắc muốn Khóa bài viết này?
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss='modal') Hủy
+            a.btn.btn-danger.btn-ok(style="color:white;") Khóa
+    //Modal page
+    .d-sm-flex.align-items-center.justify-content-between.mb-4
+      a.h3.mb-0.text-800(href="/tour" style="color:'#B5D5FF';")= "←   Chi tiết hành trình " + travel._id 
+    .card-body.p-0
+      .table-responsive
+        table#dataTable.table.table-bordered(width='100%', cellspacing='0')
+          thead
+            tr
+              th Id
+              th Tiêu đề
+              th Mô tả
+              th Hình nền
+              th
+          tbody
+            tr
+              td= travel._id
+              td= travel.title
+              td= travel.description
+              td
+                img(src=travel.background alt=travel.title width="180" height="100")
+              td
+                if !travel.is_hidden
+                  if travel.isShare
+                    a(href='#', data-href="/tour/detail/block/"+travel._id, data-toggle='modal', data-target='#confirm-block' style="color:red;") Ẩn
+                  else 
+                    a(href='#' style="color:black;") Chưa chia sẻ
+                else
+                  a(href='#', data-href="/tour/detail/unblock/"+travel._id, data-toggle='modal', data-target='#confirm-unblock' style="color:gray;") Đã Ẩn
+            // /.container-fluid
+      .table-responsive
+        table#dataTable.table.table-bordered(width='100%', cellspacing='0')
+          thead
+            tr
+              th Đi - Đến
+              th Thời gian
+              th Tạo bởi
+              th Ngày tạo
+              th Ngày chia sẻ
+              th Ngày cập nhật
+          tbody
+            tr
+              td= travel.departure + "-" + travel.destination
+              td= moment(travel.start_day).format('DD/MM/YYYY') + "-" + moment(travel.end_day).format('DD/MM/YYYY')
+              td= travel.create_by.display_name
+              td= moment(travel.create_at).format('DD/MM/YYYY')
+              td= travel.share_at? moment(travel.share_at).format('DD/MM/YYYY') : null
+              td= travel.update_at? moment(travel.update_at).format('DD/MM/YYYY') : null
+      - var n = 1;
+      h5 Lịch trình
+      ul.pagination
+        while n <= nod
+          if n===day
+            li.page-item.active
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+          else
+            li.page-item
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+      // Nested Row within Card Body
+      .timeline
+        each val, index in schedule
+          if index%2===0
+            .infobox.left
+              .infobox-content
+                h5(color="#34D374")= val.tourist_destination_name
+                p= val.tourist_destination_address
+                img(src=val.tourist_destination_image alt=val.tourist_destination_name width="180" height="100")
+          else
+            .infobox.right
+              .infobox-content
+                h5(color="#34D374")= val.tourist_destination_name
+                p= val.tourist_destination_address
+                img(src=val.tourist_destination_image alt=val.tourist_destination_name width="180" height="100")
+      br
+      br
+      - var n = 1;
+      ul.pagination
+        while n <= nod
+          if n===day
+            li.page-item.active
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+          else
+            li.page-item
+              a.page-link(href=`/tour/${travel._id}/day_${n}`)= "Ngày " + n++
+        //- .infobox.right
+        //-   .infobox-content
+        //-     h4 2016
+        //-     p Lorem ipsum..

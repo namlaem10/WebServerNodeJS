@@ -794,6 +794,7 @@ module.exports.rating = async (req, res) => {
   const user = await User.findOne({ _id: idUser });
   const idTravel = req.params.id;
   const new_rating = {
+    id_user: idUser,
     avatar: user.avatar,
     username: user.display_name,
     rating: req.body.rating,
@@ -808,30 +809,69 @@ module.exports.rating = async (req, res) => {
           if (item) return (total += item.rating);
         });
       }
-      Travel.updateOne(
-        { _id: idTravel },
-        {
-          rating_history: [...travel.rating_history, new_rating],
-          rating_count: travel.rating_count + 1,
-          rating:
-            total === 0
-              ? +req.body.rating
-              : Math.round(
-                  (total + +req.body.rating) / (travel.rating_count + 1)
-                ),
-        },
-        (err) => {
-          if (err) res.status(400).send(err);
-          Travel.findOne(
-            { _id: travel._id },
-            "rating rating_count rating_history -_id",
-            (err, newrating) => {
-              if (err) res.status(400).send(err);
-              res.status(200).json(newrating);
-            }
-          );
-        }
-      );
+      let checkTravelRatingHistory = travel.rating_history.filter((item) => {
+        return item.id_user === idUser;
+      });
+      if (checkTravelRatingHistory.length > 0) {
+        let curRating = 0;
+        let newRatingHistory = travel.rating_history;
+        newRatingHistory.map((item) => {
+          if (item._id === checkTravelRatingHistory[0]._id) {
+            curRating = item.rating;
+            item.rating = req.body.rating;
+          }
+        });
+        ratingPoint =
+          total === 0
+            ? +req.body.rating
+            : Math.round(
+                (total + +req.body.rating - +curRating) / travel.rating_count
+              );
+        console.log(req.body.rating, curRating, ratingPoint);
+        Travel.updateOne(
+          { _id: idTravel },
+          {
+            rating_history: newRatingHistory,
+            rating: ratingPoint,
+          },
+          (err) => {
+            if (err) res.status(400).send(err);
+            Travel.findOne(
+              { _id: travel._id },
+              "rating rating_count rating_history -_id",
+              (err, newrating) => {
+                if (err) res.status(400).send(err);
+                res.status(200).json(newrating);
+              }
+            );
+          }
+        );
+      } else {
+        Travel.updateOne(
+          { _id: idTravel },
+          {
+            rating_history: [...travel.rating_history, new_rating],
+            rating_count: travel.rating_count + 1,
+            rating:
+              total === 0
+                ? +req.body.rating
+                : Math.round(
+                    (total + +req.body.rating) / (travel.rating_count + 1)
+                  ),
+          },
+          (err) => {
+            if (err) res.status(400).send(err);
+            Travel.findOne(
+              { _id: travel._id },
+              "rating rating_count rating_history -_id",
+              (err, newrating) => {
+                if (err) res.status(400).send(err);
+                res.status(200).json(newrating);
+              }
+            );
+          }
+        );
+      }
     }
   });
 };

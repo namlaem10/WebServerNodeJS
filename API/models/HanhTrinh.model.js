@@ -50,6 +50,7 @@ var travelSchema = new Schema({
   ],
   rating_history: [
     {
+      id_user: String,
       avatar: String,
       username: String,
       rating: Number,
